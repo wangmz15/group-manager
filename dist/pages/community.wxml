@@ -1,0 +1,44 @@
+
+  <view>
+    <view  wx:if="{{ from == '0' }}">
+      <block wx:for="{{postList}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+        <view class="inremind" bindtap="bindShowDetail" data-wpybindshowdetail-a="{{item.postID}}">
+          <i-row i-class="rowstart">
+            <i-row i-class="uploader">
+              <i-avatar src="{{ item.authorAvatarUrl }}" size="mini" i-class="avatar"/> {{item.authorNickName}} {{item.createdAt}}
+            </i-row>
+          </i-row>
+          <i-row i-class="title">{{item.postTitle}}</i-row>
+          <i-row i-class="content">
+            {{item.postContent}}
+          </i-row>
+          <i-row>
+            <i-row i-class="description">浏览({{item.viewerNumber}})</i-row>
+          </i-row>
+        </view>
+      </block>
+      <i-icon type="add" size="35" class="float-button" bindtap="addPost"/>
+    </view>
+
+    <view  wx:if="{{ from == '1' || from === '2' }}">
+      <block wx:for="{{myPostList}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+        <view class="inremind" bindtap="bindShowDetail" data-wpybindshowdetail-a="{{item.postID}}">
+          <i-row i-class="rowstart">
+            <i-row i-class="uploader">
+              <i-avatar src="{{ item.authorAvatarUrl }}" size="mini" i-class="avatar"/> {{item.authorNickName}} {{item.createdAt}}
+            </i-row>
+           
+          </i-row>
+          <i-col span="24" i-class="title">{{item.postTitle}}</i-col>
+          <i-row i-class="content">
+            <text>{{item.postContent}}</text>
+          </i-row>
+          
+          <i-row>
+            <i-row i-class="description">浏览({{item.viewerNumber}})</i-row>
+          </i-row>
+        </view>
+      </block>
+      <i-icon type="add" size="35" class="float-button" bindtap="addPost"/>
+    </view>
+  </view>

@@ -1,0 +1,39 @@
+
+  <view class="container">
+    <view class="notice_header">
+      <view class="title">
+        {{ notice.noticeTitle || '加载中...' }}
+      </view>
+      <view class="notice_author">
+        <view  wx:if="{{ notice }}">
+          {{ notice.authorNickName }} 发布于 {{ notice.createdAt }}
+          <view wx:if="{{ deleteable }}" bindtap="handleDelete" style="display: inline; float: right">
+            删除
+          </view>
+        </view>
+        <view  wx:else>
+          加载中...
+        </view>
+      </view>
+    </view>
+    <i-panel>
+      <view class="content">
+        <rich-text nodes="{{ notice.noticeContentNodes }}"/>
+      </view>
+    </i-panel>
+    <view wx:if="{{ notice }}" style="position:fixed; bottom:0; width:100%;">
+      <view class="viewers_title">
+        看过该公告的人(共{{ notice.viewers.length }}人)
+      </view>
+      <i-panel bindtap="handleClickViewers">
+        <block wx:for="{{ frontViewers }}" wx:for-index="index" wx:for-item="item" wx:key="index">
+
+            <i-avatar src="{{ item.avatarUrl }}" i-class="avatar" size="normal"/>
+
+        </block>
+        <view style="display: inline" wx:if="{{ moreViewers }}">
+          ...
+        </view>
+      </i-panel>
+    </view>
+  </view>

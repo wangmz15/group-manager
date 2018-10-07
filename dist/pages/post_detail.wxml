@@ -1,0 +1,66 @@
+
+    <view>
+      <view class="inremind">
+        <i-row i-class="rowstart">
+          <i-col span="24" i-class="uploader">
+            <i-avatar src="{{ authorAvatarUrl }}" size="mini" i-class="avatar"/> {{authorNickName}} {{createdAt}}
+            <view style="float: right;padding-top: 20rpx;"><i-icon  wx:if="{{ editable }}" type="more" size="25" bindtap="more_op"/></view>
+          </i-col>
+        </i-row>
+        <i-row i-class="title">{{postTitle}}</i-row>
+        <i-row i-class="content">
+          <view class="rich-text-wrp">
+            <rich-text nodes="{{ postContentNodes }}"/>
+          </view>
+        </i-row>
+        <i-row i-class="rowend">
+          <br/>
+          <i-row i-class="description">浏览({{viewerNumber}})</i-row>
+        </i-row>
+      </view>
+      <i-action-sheet visible="{{ actionsVisible }}" actions="{{ actions }}" show-cancel="show-cancel"  bind:cancel="handleActionCancel" bind:click="handleActionClick"/>
+
+      <view class="comments">
+        <view class="title1">
+          <text>所有评论</text>
+        </view>
+        <block wx:for="{{comments}}" wx:for-index="index" wx:for-item="each" wx:key="index">
+          <view class="comment_list">
+            <!--需要对前端进行区分-->
+            <view class="main_com">
+              <i-avatar i-class="avatar" src="{{each.avatarUrl}}" size="default" bindtap="user"/>
+              <text class="nickname" bindtap="user">{{each.nickName}}</text>
+              <view class="detail_comment">
+                <rich-text nodes="{{ each.commentContentNodes }}"/>
+              </view>
+              <view class="footer">
+                <view class="time"><text>{{each.commentCreatedAt}}</text></view>
+                <view class="ico" catchtap="like" data-idd="{{each.commentID}}" data-wpylike-a="{{index}}">
+                  <i-icon type="{{each.ilike?'praise_fill':'praise'}}" size="20"/>
+                  {{each.likeNum}}
+                </view>
+                <view class="ico1" bindtap="do_comment" data-wpydo_comment-a="comment" data-wpydo_comment-b="{{each.commentID}}">
+                  <i-icon size="20" type="message"/>
+                  {{each.subcomments.length}}
+                </view>
+              </view>
+            </view>
+            <!--需要对前端进行区分-->
+            <view class="repeat">
+              <block wx:for="{{each.subcomments_short}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+                <view class="each_repeat" bindtap="do_comment" data-wpydo_comment-a="subcomment" data-wpydo_comment-b="{{each.commentID}}" data-wpydo_comment-c="{{item.openID}}">
+                  <text class="nickname" catchtap="user">{{item.nickName}}: </text>
+                  <text hidden="{{!item.replyNickname}}">回复:</text>
+                  <text class="nickname" hidden="{{!item.replyNickname}}" catchtap="user">{{item.replyNickname}}:</text>
+                  <text>{{ item.commentContent }}</text>
+                </view>
+              </block>
+              <view  wx:if="{{each.subcomments.length>2}}" class="repeat_sum" bindtap="lookCom" data-wpylookcom-a="{{each.commentID}}">共{{each.subcomments.length}}条评论</view>
+            </view>
+          </view>
+        </block>
+        <view class="dorepeat" bindtap="do_comment" data-wpydo_comment-a="post" data-wpydo_comment-b="{{postID}}">
+          <i-input value="" disabled="true" mode="normal" placeholder="评论点什么吧："/>
+        </view>
+      </view>
+    </view>

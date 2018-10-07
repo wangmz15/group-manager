@@ -1,0 +1,37 @@
+
+    <view>
+        <view  wx:if="{{!isChoose}}">
+          <view class="album">
+            <block wx:for="{{album.images}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+              <view class="each_album">
+                <view class="header" style="background-image: url({{item.url}}); background-size: cover; background-repeat: no-repeat, repeat; max-size: 350rpx 350rpx;" bindtap="previewImage" bindlongpress="handleLongPress" data-wpypreviewimage-a="{{ item.key }}">
+                </view>
+                <view class="footer">
+                  <view class="textt"> {{ item.description }} </view>
+                  <i-icon type="switch" i-class="icone" size="25" bindtap="more_op" data-wpymore_op-a="{{item.key}}"/>
+                </view>
+              </view>
+            </block>
+          </view>
+          <i-icon type="add" size="35" class="float-button" bindtap="addImage"/>
+        </view>
+
+        <!-- 多选视图 -->
+        <view  wx:if="{{isChoose}}" class="parent">
+                <checkbox-group current="{{current}}" bindchange="handleChoiseChange">
+                    <checkbox class="edit-child" wx:for="{{album.images}}" value="{{item.key}}" checked="{{item.checked}}">
+                        <image class="edit-image" src="{{item.url}}"/>
+                    </checkbox>
+                </checkbox-group>
+            <view class="text-center">
+                <button bindtap="handleCancelMulti" size="mini" inline="inline">取消</button>
+                <button bindtap="handleDeleteMulti" size="mini" type="warn" disabled="{{disabled}}" inline="inline">删除</button>
+            </view>
+        </view>
+
+        <i-action-sheet visible="{{ actionsVisible }}" actions="{{ actions }}" show-cancel="show-cancel" bindcancel="handleActionCancel" bindclick="handleActionClick"/>
+
+        <i-modal title="删除确认" visible="{{ confirmVisiable }}" actions="{{ confirmActions }}"  bind:click="handleDelete">
+            <view>删除后无法恢复哦</view>
+        </i-modal>
+    </view>

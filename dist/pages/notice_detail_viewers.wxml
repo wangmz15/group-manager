@@ -1,0 +1,24 @@
+
+  <view class="container">
+    <view class="notice_header">
+      <view class="notice_title">
+        {{ notice.noticeTitle || '加载中...' }}
+      </view>
+      <view class="notice_author">
+        <view  wx:if="{{ notice }}">
+          {{ notice.authorNickName }} 发布于 {{ notice.createdAt }}
+        </view>
+        <view  wx:else>
+          加载中...
+        </view>
+      </view>
+    </view>
+    <view i-class="viewers-list">
+      <block wx:for="{{notice.viewers}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+        <i-panel i-class="content">
+          <i-avatar src="{{ item.avatarUrl }}" size="large"/>
+          {{ item.nickName }}
+        </i-panel>
+      </block>
+    </view>
+  </view>

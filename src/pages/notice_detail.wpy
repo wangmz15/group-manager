@@ -1,0 +1,197 @@
+<style lang="less">
+@import url(../less/notice);
+.title {
+  font-size: 34rpx;
+
+  margin-top: 20rpx;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+.content {
+  font-size: 30rpx;
+  color: #495060;
+  padding-top: 20rpx;
+  padding-bottom: 20rpx;
+  line-height: 40rpx;
+  text-indent: 40rpx;
+}
+.viewers_title {
+  
+}
+.ever {
+  float: left;
+  margin-left: 20rpx;
+  background: green;
+}
+.avatar {
+  margin-left: 20rpx;
+  margin-top: 10rpx;
+  margin-bottom: 10rpx;
+}
+</style>
+
+<template>
+  <view class="container">
+    <view class="notice_header">
+      <view class="title">
+        {{ notice.noticeTitle || '加载中...' }}
+      </view>
+      <view class="notice_author">
+        <view wx:if="{{ notice }}">
+          {{ notice.authorNickName }} 发布于 {{ notice.createdAt }}
+          <view wx:if="{{ deleteable }}" bindtap="handleDelete" style="display: inline; float: right">
+            删除
+          </view>
+        </view>
+        <view wx:else>
+          加载中...
+        </view>
+      </view>
+    </view>
+    <i-panel>
+      <view class="content">
+        <rich-text nodes="{{ notice.noticeContentNodes }}"></rich-text>
+      </view>
+    </i-panel>
+    <view wx:if="{{ notice }}" style="position:fixed; bottom:0; width:100%;">
+      <view class="viewers_title">
+        看过该公告的人(共{{ notice.viewers.length }}人)
+      </view>
+      <i-panel bindtap="handleClickViewers">
+        <repeat for="{{ frontViewers }}" key="index" index="index" item="item">
+
+            <i-avatar src="{{ item.avatarUrl }}" i-class="avatar" size="normal"></i-avatar>
+
+        </repeat>
+        <view style="display: inline" wx:if="{{ moreViewers }}">
+          ...
+        </view>
+      </i-panel>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/utils/api';
+import refreshNoticeMixin from '@/mixins/refresh_notice';
+
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '加载中...',
+    usingComponents: {
+      'i-panel': '../iview/panel/index',
+      'i-button': '../iview/button/index',
+      'i-row': '../iview/row/index',
+      'i-col': '../iview/col/index',
+      'i-card': '../iview/card/index',
+      'i-input': '../iview/input/index',
+      'i-cell-group': '../iview/cell-group/index',
+      'i-cell': '../iview/cell/index',
+      'i-avatar': '../iview/avatar/index'
+    },
+    enablePullDownRefresh: true
+  };
+
+  components = {};
+
+  methods = {
+    async handleDelete() {
+      let info = await wepy.showModal({
+        title: '确认删除',
+        content: '确认删除公告？'
+      });
+      // console.log(info);
+      if (info.cancel) return;
+      await api.authRequest({
+        url: 'deleteNotice',
+        method: 'POST',
+        data: {
+          noticeID: this.noticeID,
+          openGID: await this.$parent.fetchOpenGID()
+        }
+      });
+      // console.log(res);
+      wepy.navigateBack();
+    },
+    async handleClickViewers() {
+      // console.log('handleClickViewers');
+      wepy.navigateTo({
+        url: '/pages/notice_detail_viewers?notice_id=' + this.noticeID
+      });
+    }
+  };
+
+  computed = {
+    moreViewers() {
+      return this.notice && this.notice.viewers.length > 6;
+    },
+    frontViewers() {
+      return this.notice ? this.notice.viewers.slice(0, 6) : [];
+    },
+    deleteable() {
+      return this.notice
+        ? this.notice.authorOpenID === this.$parent.globalData.openID
+        : false;
+    },
+    noticeContent() {
+      return this.notice ? this.notice.noticeContent : '';
+    }
+  };
+
+  mixins = [refreshNoticeMixin];
+
+  onShareAppMessage(options) {
+    let title = '群公告';
+    let path = `/pages/notice_detail?openGID=${this.$parent.globalData.openGID}&notice_id=${this.noticeID}`;
+    if (this.notice && this.notice.noticeTitle) {
+      title = '我分享了一个群公告：' + this.notice.noticeTitle;
+    }
+
+    return {
+      title: title,
+      path: path,
+      imageUrl: '/images/logo.png'
+    };
+  }
+
+  onLoad(options) {
+    // console.log('/pages/notice_detail onLoad:');
+    // console.log(options);
+    this.noticeID = options.notice_id;
+  }
+
+  async onShow() {
+    if (
+      !await this.$parent.authorizeRequired() ||
+      !await this.$parent.groupRequired()
+    ) {
+      return;
+    }
+    wepy.showShareMenu({
+      withShareTicket: true
+    });
+    if (!this.noticeID) {
+      await wepy.showModal({
+        title: '未知错误',
+        content: '发送未知错误',
+        showCancel: false
+      });
+      wepy.navigateBack();
+    } else {
+      await this.refreshNotice();
+    }
+    this.$apply();
+  }
+
+  onPullDownRefresh() {
+    wepy.stopPullDownRefresh();
+    this.refreshNotice();
+  }
+
+  data = {
+    noticeID: null,
+    notice: null
+  };
+}
+</script>

@@ -1,0 +1,106 @@
+<style lang="less">
+page {
+  background-color: rgb(250, 250, 250);
+}
+.main {
+  padding-top: 50rpx;
+  background-color: #fff;
+}
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px;
+  font-size: 14px;
+}
+.textarea-placeholder {
+  font-size: 14px;
+}
+</style>
+
+<template>
+  <view class="main">
+    <i-panel title="标题">
+      <i-input bind:change='handleTitle' type="text" placeholder="请输入标题(最多20字)" maxlength="20"></i-input>
+    </i-panel>
+    <i-panel title="内容">
+      <textarea class="textarea" bindinput="handleContent" placeholder="请输入内容(最多150字)" maxlength="150" placeholder-class="textarea-placeholder"></textarea>
+    </i-panel>
+    <toolbar
+      left="emoji" right="submit"
+      :submitDisable.sync="submitdisable"
+      @submit.user="handleSubmit"></toolbar>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/utils/api';
+import Toolbar from '@/components/toolbar';
+
+// FIXME 空值检查
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '新建公告',
+    usingComponents: {
+      'i-panel': '../iview/panel/index',
+      'i-button': '../iview/button/index',
+      'i-row': '../iview/row/index',
+      'i-col': '../iview/col/index',
+      'i-card': '../iview/card/index',
+      'i-input': '../iview/input/index',
+      'i-cell-group': '../iview/cell-group/index',
+      'i-cell': '../iview/cell/index'
+    }
+  };
+  components = {
+    toolbar: Toolbar
+  };
+
+  data = {
+    noticeTitle: '',
+    noticeContent: ''
+  };
+  computed = {
+    submitdisable() {
+      return !(this.noticeTitle && this.noticeContent);
+    }
+  };
+
+  methods = {
+    handleTitle(e) {
+      this.noticeTitle = e.detail.detail.value;
+    },
+    handleContent(e) {
+      this.noticeContent = e.detail.value;
+    },
+    async handleSubmit() {
+      await api.authRequest(
+        {
+          url: 'newNotice',
+          data: {
+            openGID: await this.$parent.fetchOpenGID(),
+            noticeTitle: this.noticeTitle,
+            noticeContent: this.noticeContent
+          },
+          method: 'POST'
+        },
+        true
+      );
+      // console.log(res);
+      await wepy.showModal({
+        title: '成功',
+        content: '公告发布成功',
+        showConcel: false
+      });
+      wepy.navigateBack();
+    }
+  };
+
+  async onShow() {
+    if (!await this.$parent.authorizeRequired() || !await this.$parent.groupRequired()) {
+      return;
+    }
+    await wepy.hideShareMenu();
+  }
+}
+</script>

@@ -1,0 +1,49 @@
+
+  <view>
+      <view class="comments">
+        <view class="title">
+          <text>评论详情</text>
+        </view>
+
+        <view class="comment_list">
+          <!-- 主楼 -->
+          <view class="main_com">
+            <i-avatar i-class="avatar" src="{{ comment.avatarUrl }}" size="default"/>
+            <text class="nickname" bindtap="user">{{ comment.nickName }}</text>
+            <view class="detail_comment">
+              <rich-text nodes="{{ comment.commentContentNodes }}"/>
+            </view>
+            <view class="footer">
+              <view class="time"><text>{{commentCreatedAt}}</text></view>
+              <view class="ico" bindtap="like1">
+                <i-icon type="{{comment.ilike?'praise_fill':'praise'}}" size="20"/>
+                {{comment.likeNum}}
+              </view>
+            </view>
+          </view>
+          <!-- 楼中楼 -->
+          <block wx:for="{{ comment.subcomments }}" wx:for-index="index" wx:for-item="item" wx:key="index">
+            <view class="repeat">
+              <i-avatar i-class="avatar" src="{{ item.avatarUrl }}" size="small"/>
+              <text class="nickname" bindtap="user">{{ item.nickName }}</text>
+              <text class="call" hidden="{{!item.replyOpenID}}">回复:</text>
+              <text class="nickname" bindtap="user" hidden="{{!item.replyOpenID}}">{{ item.replyNickname }}</text>
+              <view class="detail_comment" bindtap="do_comment" data-wpydo_comment-a="subcomment" data-wpydo_comment-b="{{commentID}}" data-wpydo_comment-c="{{item.openID}}">
+                <text>{{ item.commentContent }}</text>
+              </view>
+              <view class="footer">
+                <view class="time"><text>{{ item.updatedAt }}</text></view>
+                <view class="ico1" bindtap="like" data-wpylike-a="{{index}}">
+                  <i-icon type="{{item.ilike?'praise_fill':'praise'}}" size="18"/>
+                  {{item.likeNum}}
+                </view>
+              </view>
+            </view>
+          </block>
+        </view>
+
+        <view class="dorepeat" bindtap="do_comment" data-wpydo_comment-a="comment" data-wpydo_comment-b="{{commentID}}">
+           <i-input disabled="true" mode="normal" placeholder="回复楼主："/>
+        </view>
+      </view>
+  </view>

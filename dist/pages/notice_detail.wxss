@@ -1,0 +1,54 @@
+.viewers_title {
+  font-size: 30rpx;
+  color: #aaa;
+}
+.notice_header {
+  margin: 10rpx;
+}
+.notice_title {
+  font-size: 40rpx;
+  font-family: '宋体';
+}
+.notice_author {
+  font-size: 30rpx;
+  color: #aaa;
+}
+.notice_content {
+  padding: 15rpx;
+  font-family: '宋体';
+}
+.title {
+  font-size: 40rpx;
+  text-align: center;
+  color: #393938;
+}
+.content {
+  font-size: 35rpx;
+  margin: auto;
+  width: 90%;
+  color: #4b4b48;
+}
+.title {
+  font-size: 34rpx;
+  margin-top: 20rpx;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+.content {
+  font-size: 30rpx;
+  color: #495060;
+  padding-top: 20rpx;
+  padding-bottom: 20rpx;
+  line-height: 40rpx;
+  text-indent: 40rpx;
+}
+.ever {
+  float: left;
+  margin-left: 20rpx;
+  background: green;
+}
+.avatar {
+  margin-left: 20rpx;
+  margin-top: 10rpx;
+  margin-bottom: 10rpx;
+}

@@ -1,0 +1,170 @@
+{
+	"description": "A WePY project",
+	"setting": {
+		"urlCheck": false,
+		"es6": false,
+		"postcss": false,
+		"minified": false,
+		"newFeature": true
+	},
+	"compileType": "miniprogram",
+	"appid": "wx392a705600479ede",
+	"projectname": "frontend",
+	"miniprogramRoot": "./dist",
+	"condition": {
+		"search": {
+			"current": -1,
+			"list": []
+		},
+		"conversation": {
+			"current": -1,
+			"list": []
+		},
+		"plugin": {
+			"current": -1,
+			"list": []
+		},
+		"game": {
+			"list": []
+		},
+		"miniprogram": {
+			"current": 4,
+			"list": [
+				{
+					"id": 0,
+					"name": "从群里打开/首页",
+					"pathName": "pages/first_page",
+					"query": "",
+					"scene": "1044",
+					"shareInfo": {
+						"groupName": "测试模拟群0",
+						"shareName": "4DOXZJJY0WuDushr9vVLlLXBcWpxva4SN1EcRZr0vmA@cr4dev",
+						"shareKey": "nBWskLe1qx37icGUluLyjYhdgGsSb4NZGgBWLfzYeuz1UNGJPxU73ynM1naiPjyLhKRDkrFBl0RcX073fo-9Dw~~"
+					}
+				},
+				{
+					"id": 1,
+					"name": "从群里打开公告",
+					"pathName": "pages/notice_detail",
+					"query": "notice_id=10",
+					"scene": "1044",
+					"shareInfo": {
+						"groupName": "测试模拟群0",
+						"shareName": "4DOXZJJY0WuDushr9vVLlLXBcWpxva4SN1EcRZr0vmA@cr4dev",
+						"shareKey": "nBWskLe1qx37icGUluLyjYhdgGsSb4NZGgBWLfzYeuz1UNGJPxU73ynM1naiPjyLhKRDkrFBl0RcX073fo-9Dw~~"
+					}
+				},
+				{
+					"id": 2,
+					"name": "我的",
+					"pathName": "pages/user",
+					"query": "",
+					"scene": "1044",
+					"shareInfo": {
+						"groupName": "测试模拟群0",
+						"shareName": "4DOXZJJY0WuDushr9vVLlLXBcWpxva4SN1EcRZr0vmA@cr4dev",
+						"shareKey": "nBWskLe1qx37icGUluLyjYhdgGsSb4NZGgBWLfzYeuz1UNGJPxU73ynM1naiPjyLhKRDkrFBl0RcX073fo-9Dw~~"
+					}
+				},
+				{
+					"id": 3,
+					"name": "社区",
+					"pathName": "pages/community",
+					"query": "from=0",
+					"scene": "1044",
+					"shareInfo": {
+						"groupName": "测试模拟群0",
+						"shareName": "4DOXZJJY0WuDushr9vVLlLXBcWpxva4SN1EcRZr0vmA@cr4dev",
+						"shareKey": "nBWskLe1qx37icGUluLyjYhdgGsSb4NZGgBWLfzYeuz1UNGJPxU73ynM1naiPjyLhKRDkrFBl0RcX073fo-9Dw~~"
+					}
+				},
+				{
+					"id": 4,
+					"name": "帖子详情",
+					"pathName": "pages/post_detail",
+					"query": "post_id=9",
+					"scene": "1044",
+					"shareInfo": {
+						"groupName": "测试模拟群0",
+						"shareName": "4DOXZJJY0WuDushr9vVLlLXBcWpxva4SN1EcRZr0vmA@cr4dev",
+						"shareKey": "nBWskLe1qx37icGUluLyjYhdgGsSb4NZGgBWLfzYeuz1UNGJPxU73ynM1naiPjyLhKRDkrFBl0RcX073fo-9Dw~~"
+					}
+				},
+				{
+					"id": 5,
+					"name": "相册列表",
+					"pathName": "pages/album_list",
+					"query": "",
+					"scene": "1044",
+					"shareInfo": {
+						"groupName": "测试模拟群0",
+						"shareName": "4DOXZJJY0WuDushr9vVLlLXBcWpxva4SN1EcRZr0vmA@cr4dev",
+						"shareKey": "nBWskLe1qx37icGUluLyjYhdgGsSb4NZGgBWLfzYeuz1UNGJPxU73ynM1naiPjyLhKRDkrFBl0RcX073fo-9Dw~~"
+					}
+				},
+				{
+					"id": 6,
+					"name": "相册详情",
+					"pathName": "pages/album_detail",
+					"query": "album_id=1",
+					"scene": "1044",
+					"shareInfo": {
+						"groupName": "测试模拟群0",
+						"shareName": "4DOXZJJY0WuDushr9vVLlLXBcWpxva4SN1EcRZr0vmA@cr4dev",
+						"shareKey": "nBWskLe1qx37icGUluLyjYhdgGsSb4NZGgBWLfzYeuz1UNGJPxU73ynM1naiPjyLhKRDkrFBl0RcX073fo-9Dw~~"
+					}
+				},
+				{
+					"id": 7,
+					"name": "公告列表",
+					"pathName": "pages/notice_list",
+					"query": "",
+					"scene": "1044",
+					"shareInfo": {
+						"groupName": "测试模拟群0",
+						"shareName": "4DOXZJJY0WuDushr9vVLlLXBcWpxva4SN1EcRZr0vmA@cr4dev",
+						"shareKey": "nBWskLe1qx37icGUluLyjYhdgGsSb4NZGgBWLfzYeuz1UNGJPxU73ynM1naiPjyLhKRDkrFBl0RcX073fo-9Dw~~"
+					}
+				},
+				{
+					"id": 8,
+					"name": "新建文章",
+					"pathName": "pages/post_new",
+					"query": "",
+					"scene": "1044",
+					"shareInfo": {
+						"groupName": "测试模拟群0",
+						"shareName": "4DOXZJJY0WuDushr9vVLlLXBcWpxva4SN1EcRZr0vmA@cr4dev",
+						"shareKey": "nBWskLe1qx37icGUluLyjYhdgGsSb4NZGgBWLfzYeuz1UNGJPxU73ynM1naiPjyLhKRDkrFBl0RcX073fo-9Dw~~"
+					}
+				},
+				{
+					"id": -1,
+					"name": "上传图片",
+					"pathName": "pages/album_insert_image",
+					"query": "album_id=3",
+					"scene": "1044",
+					"shareInfo": {
+						"groupName": "测试模拟群0",
+						"shareName": "4DOXZJJY0WuDushr9vVLlLXBcWpxva4SN1EcRZr0vmA@cr4dev",
+						"shareKey": "nBWskLe1qx37icGUluLyjYhdgGsSb4NZGgBWLfzYeuz1UNGJPxU73ynM1naiPjyLhKRDkrFBl0RcX073fo-9Dw~~"
+					}
+				},
+				{
+					"id": -1,
+					"name": "主页",
+					"pathName": "pages/first_page",
+					"query": "",
+					"scene": "1001"
+				},
+				{
+					"id": -1,
+					"name": "普通打开",
+					"pathName": "pages/first_page",
+					"query": "",
+					"scene": "1001"
+				}
+			]
+		}
+	}
+}

@@ -1,0 +1,53 @@
+
+  <view class="container">
+    <view class="tab">
+      <i-tabs current="{{ current }}" bindchange="handleChange">
+        <i-tab key="tab1" title="群相册"/>
+        <i-tab key="tab2" title="我的相册"/>
+        <i-tab key="tab3" title="最近浏览"/>
+      </i-tabs>
+    </view>
+    <!-- 群相册 -->
+    <view class="album" hidden="{{!(current == 'tab1')}}">
+      <block wx:for="{{albums}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+        <view class="each_album">
+          <view class="header" style="background-image: url({{item.cover}}); background-size: cover; background-repeat: no-repeat, repeat; max-size: 350rpx 350rpx;" bindtap="short_touch" data-wpyshort_touch-a="{{item.albumID}}">
+          </view>
+          <view class="footer">
+            <i-avatar src="{{ item.createrAvatarUrl }}" size="default" i-class="avatar"/>
+            <view class="textt"> {{ item.albumTitle }} </view>
+            <i-icon type="switch" i-class="icone" size="25" bindtap="more_op" data-wpymore_op-a="{{item.albumID}}"/>
+          </view>
+        </view>
+      </block>
+      <i-icon type="add" size="35" class="float-button" bindtap="addAlbum"/> <!-- 悬浮按钮 -->
+    </view>
+    <!-- 群相册 -->
+
+    <!-- 我的相册 -->
+    <view class="album" hidden="{{!(current == 'tab2')}}">
+      <block wx:for="{{myAlbums}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+        <view class="each_album">
+          <view class="header" style="background-image: url({{item.cover}}); background-size: cover; background-repeat: no-repeat, repeat; max-size: 350rpx 350rpx;" bindtap="short_touch" bindlongtap="longpress" bindtouchstart="touch_start" bindtouchend="touch_end" data-wpyshort_touch-a="{{item.albumID}}">
+          </view>
+          <view class="footer">
+            <i-avatar src="{{ item.createrAvatarUrl }}" size="default" i-class="avatar"/>
+            <view class="textt"> {{ item.albumTitle }} </view>
+            <i-icon type="switch" i-class="icone" size="25" bindtap="more_op" data-wpymore_op-a="{{item.albumID}}"/>
+          </view>
+
+        </view>
+      </block>
+      <i-icon type="add" size="35" class="float-button" bindtap="addAlbum"/>
+    </view>
+    <!-- 我的相册 -->
+
+    <view class="album" hidden="{{!(current == 'tab3')}}">
+      <view class="not_open">暂未开放</view>
+    </view>
+
+    <i-modal title="重命名" visible="{{ editVisible }}"  bind:ok="handleEditSubmit" bind:cancel="handleEditClose">
+      <input value="{{ currentAlbumTitle }}" bindinput="handleAlbumTitleChange" placeholder="请输入相册名称"/>
+    </i-modal>
+    <i-action-sheet visible="{{ actionsVisible }}" actions="{{ actions }}" show-cancel="show-cancel"  bind:cancel="handleActionCancel" bind:click="handleActionClick"/>
+  </view>

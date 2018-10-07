@@ -1,0 +1,190 @@
+<style lang="less">
+@import url(less/main.less);
+</style>
+
+<script>
+import wepy from 'wepy';
+import 'wepy-async-function';
+import api from '@/utils/api';
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/first_page',
+      'pages/album_insert_image',
+      'pages/album_detail',
+      'pages/community',
+      'pages/album_add',
+      'pages/album_list',
+      'pages/notice_list',
+      'pages/notice_new',
+      'pages/notice_detail',
+      'pages/notice_detail_viewers',
+      'pages/user',
+      'pages/post_detail',
+      'pages/post_new',
+      'pages/comment_new',
+      'pages/comment_detail'
+    ],
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#fff',
+      navigationBarTitleText: 'WeChat',
+      navigationBarTextStyle: 'black'
+    },
+    tabBar: {
+      list: [
+        {
+          pagePath: 'pages/first_page',
+          text: '首页',
+          iconPath: 'images/home.png',
+          selectedIconPath: 'images/home_fill.png'
+        },
+        {
+          pagePath: 'pages/community',
+          text: '社区',
+          iconPath: 'images/group.png',
+          selectedIconPath: 'images/group_fill.png'
+        },
+        {
+          pagePath: 'pages/user',
+          text: '我的',
+          iconPath: 'images/mine.png',
+          selectedIconPath: 'images/mine_fill.png'
+        }
+      ]
+    }
+  };
+
+  globalData = {
+    userInfo: null, // 用户信息
+    openID: null, // 用户的openID
+    shareTicket: null,
+    openGID: null, // 当前的群ID，如果为null表示是从下拉进入的，请使用fetchOpenGID获取
+    initOK: false, // 是否初始化完成
+    authorized: null, // 是否已经登录，null表示未知,
+    index: 0
+  };
+
+  constructor() {
+    super();
+    this.use('requestfix');
+    this.use('promisify');
+  }
+
+  async onShow(options) {
+    this.globalData.index ++;
+    // 快速从不同的群打开不会执行onLoad
+    let shareTicket = options.shareTicket || this.globalData.shareTicket || null;
+    if (shareTicket !== this.globalData.shareTicket) {
+      this.globalData.shareTicket = null;
+      this.globalData.openGID = null;
+      this.globalData.initOK = false;
+    }
+
+    this.globalData.shareTicket = shareTicket;
+    console.log('index:', this.globalData.index);
+    console.log('shareTicket:', this.globalData.shareTicket);
+
+    let authRes = await api.login();
+    this.globalData.openID = authRes.data.openID;
+
+    if (this.globalData.shareTicket) {
+      let info = await wepy.getShareInfo({
+        shareTicket: this.globalData.shareTicket
+      });
+      let res = await api.authRequest(
+        {
+          url: 'updateGID',
+          data: {
+            encryptedData: info.encryptedData,
+            iv: info.iv
+          },
+          method: 'POST'
+        },
+        false
+      );
+      this.globalData.openGID = res.data.openGID;
+    }
+
+    if (options.query.openGID && options.query.openGID !== this.globalData.openGID && ['pages/first_page', 'pages/user'].indexOf(options.path) === -1) { // 从其他群打开时跳转到首页
+      wepy.switchTab({
+        url: '/pages/first_page'
+      });
+    }
+
+    this.globalData.initOK = true;
+  }
+
+  sleep(ms) {
+    return new Promise((resolve, reject) => {
+      setTimeout(resolve, ms);
+    });
+  }
+
+  // 如果已经登录则返回true，否则返回false并跳转到user页面
+  async authorizeRequired() {
+    if (this.globalData.authorized === null) {
+      let res = await wepy.getSetting();
+      this.globalData.authorized = res.authSetting['scope.userInfo'] || false;
+    }
+
+    if (this.globalData.authorized) {
+      this.updateUserInfo();
+      return true;
+    } else {
+      // await wepy.showModal({
+      //   title: '错误',
+      //   content: '需要登录',
+      //   showCancel: false
+      // });
+      wepy.switchTab({
+        url: '/pages/user'
+      });
+      return false;
+    }
+  }
+
+  // 需要从群里打开
+  async groupRequired() {
+    while (!this.globalData.initOK) await this.sleep(100);
+    if (this.globalData.openGID) {
+      return true;
+    } else {
+      await wepy.showModal({
+        title: '错误',
+        content: '只有从群里打开才能使用该功能',
+        showCancel: false
+      });
+      wepy.switchTab({
+        url: '/pages/user'
+      });
+      return false;
+    }
+  }
+
+  async fetchOpenGID() {
+    while (!this.globalData.initOK) await this.sleep(100);
+    return this.globalData.openGID;
+  }
+
+  // 更新用户信息
+  async updateUserInfo() {
+    await api.login();
+    let data = await wepy.getUserInfo({ withCredentials: true });
+    this.globalData.userInfo = data.userInfo;
+    await api.authRequest(
+      {
+        url: 'updateInfo',
+        data: {
+          rawData: data.rawData,
+          signature: data.signature
+        },
+        method: 'POST'
+      },
+      false
+    );
+    this.globalData.authorized = null;
+  }
+}
+</script>

@@ -1,0 +1,20 @@
+.toolbar {
+  padding: 0 10px;
+  height: 35px;
+  line-height: 35px;
+}
+.toolbar-icon {
+  margin: 0 3px;
+}
+.toolbar-textright {
+  display: inline;
+  float: right;
+}
+.toolbar-textbtn {
+  color: #97e620;
+  margin: 2px 7px;
+  font-size: 17px;
+}
+.toolbar-textbtn-disable {
+  color: #dedede;
+}

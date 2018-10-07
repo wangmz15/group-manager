@@ -1,0 +1,21 @@
+
+  <view class="main">
+    <i-panel title="标题">
+      <i-input  bind:change="handleTitle" type="text" placeholder="请输入标题(最多20字)" maxlength="20"/>
+    </i-panel>
+    <i-panel title="内容">
+      <textarea class="textarea" bindinput="handleContent" placeholder="请输入内容(最多150字)" maxlength="150" placeholder-class="textarea-placeholder"/>
+    </i-panel>
+    
+  <i-panel>
+    <view class="toolbar">
+    <i-icon  wx:if="{{$toolbar$showEmoji}}" i-class="toolbar-icon" size="25" color="#999" type="emoji" bindtap="$toolbar$handleEmoji"/>
+    <i-icon  wx:if="{{$toolbar$showPicture}}" i-class="toolbar-icon" size="25" color="#999" type="picture" bindtap="$toolbar$handlePicture"/>
+    <view class="toolbar-textright">
+        <text wx:if="{{$toolbar$showPreview}}" class="toolbar-textbtn {{ $toolbar$previewDisable ? 'toolbar-textbtn-disable': '' }}" bindtap="$toolbar$handlePreview">预览</text>
+        <text wx:if="{{$toolbar$showSubmit}}" class="toolbar-textbtn {{ $toolbar$submitDisable ? 'toolbar-textbtn-disable' : '' }}" bindtap="$toolbar$handleSubmit">发表</text>
+    </view>
+    </view>
+  </i-panel>
+
+  </view>

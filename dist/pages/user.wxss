@@ -1,0 +1,86 @@
+.auth-btn {
+  display: inline;
+}
+.container1 {
+  width: 100%;
+  height: 100%;
+  background: #f8f8f9;
+}
+.userinfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20rpx;
+}
+.userinfo-avatar {
+  width: 128rpx;
+  height: 128rpx;
+  margin: 20rpx;
+  border-radius: 50%;
+}
+.userinfo-nickname {
+  color: #aaa;
+}
+.userinfo-groupname {
+  color: #777;
+  font-size: 13px;
+}
+.menu-container {
+  margin-top: 20rpx;
+}
+.activity {
+  margin: 15rpx;
+  background: white;
+  font-size: 30rpx;
+}
+.feed {
+  margin-top: 20rpx;
+  background: white;
+}
+.feed_title {
+  padding-top: 20rpx;
+  margin-left: 20rpx;
+  padding-bottom: 20rpx;
+  font-size: 36rpx;
+}
+.inremind {
+  padding-left: 20rpx;
+  padding-right: 20rpx;
+}
+.avatar {
+  float: left;
+  width: 30%;
+  margin: 20rpx;
+}
+.text {
+  width: 100%;
+  padding-top: 24rpx;
+  font-size: 30rpx;
+  color: #80848f;
+}
+.description {
+  font-size: 25rpx;
+  color: #a8a8a8;
+  margin-right: 20rpx;
+  float: right;
+}
+.icone {
+  margin-left: 10rpx;
+}
+.activity_detail {
+  margin-top: 20rpx;
+  margin-bottom: 20rpx;
+  margin-left: 100rpx;
+  margin-right: 20rpx;
+}
+.separator {
+  height: 2rpx;
+  width: 100%;
+  margin-top: 2rpx;
+  margin-bottom: 2rpx;
+  background: #f8f8f9;
+}
+.spin {
+  padding-top: 20rpx;
+  padding-bottom: 20rpx;
+}

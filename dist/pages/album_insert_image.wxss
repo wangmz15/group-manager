@@ -1,0 +1,40 @@
+.image-description-input {
+  padding: 10px;
+  font-size: 14px;
+}
+.image-content {
+  position: relative;
+  display: inline-block;
+  width: 231rpx;
+  height: 231rpx;
+  margin: 10px 10rpx;
+  padding: 0;
+}
+.image-content image {
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.image-add-btn {
+  background-color: rgba(170, 170, 170, 0.5);
+}
+.image-delete-btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: orange;
+  color: red;
+  /* make a round button */
+  border-radius: 12px;
+  /* center text */
+  line-height: 20px;
+  text-align: center;
+  height: 20px;
+  width: 20px;
+  font-size: 18px;
+  padding: 1px;
+}
+.image-delete-btn::before {
+  content: "\2716";
+}

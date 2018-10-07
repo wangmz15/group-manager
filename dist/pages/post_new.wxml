@@ -1,0 +1,38 @@
+
+  <view class="main">
+    <i-panel title="帖子标题">
+      <i-input value="{{ title }}"  bind:change="handleTitleChange" type="text" placeholder="请输入标题(最多20字)" maxlength="20"/>
+    </i-panel>
+    <i-panel title="帖子内容">
+      <textarea value="{{ content }}" class="textarea" bindinput="handleContentInput" maxlength="-1" placeholder-class="textarea-placeholder"/>
+    </i-panel>
+    
+  <i-panel>
+    <view class="toolbar">
+    <i-icon  wx:if="{{$toolbar$showEmoji}}" i-class="toolbar-icon" size="25" color="#999" type="emoji" bindtap="$toolbar$handleEmoji"/>
+    <i-icon  wx:if="{{$toolbar$showPicture}}" i-class="toolbar-icon" size="25" color="#999" type="picture" bindtap="$toolbar$handlePicture"/>
+    <view class="toolbar-textright">
+        <text wx:if="{{$toolbar$showPreview}}" class="toolbar-textbtn {{ $toolbar$previewDisable ? 'toolbar-textbtn-disable': '' }}" bindtap="$toolbar$handlePreview">预览</text>
+        <text wx:if="{{$toolbar$showSubmit}}" class="toolbar-textbtn {{ $toolbar$submitDisable ? 'toolbar-textbtn-disable' : '' }}" bindtap="$toolbar$handleSubmit">发表</text>
+    </view>
+    </view>
+  </i-panel>
+
+
+    <view  wx:if="{{toolarea === 'emoji'}}" class="emojis_box">
+      <view class="emoji_wrap" wx:for="{{emojiList}}" wx:key="key">
+        <image catchtap="clickEmoji" src="{{item.img}}" data-key="{{item.key}}" class="emoji"/>
+      </view>
+    </view>
+    <view  wx:if="{{toolarea === 'picture'}}">
+      <block wx:for="{{images}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+        <view class="picture-content">
+          <image src="{{ item.url }}"/>
+        </view>
+      </block>
+      <view class="picture-content picture-add-btn">
+        <image src="/images/plus.png" bindtap="addPicture"/>
+      </view>
+    </view>
+    
+  </view>

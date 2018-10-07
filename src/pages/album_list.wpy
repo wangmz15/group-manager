@@ -1,0 +1,354 @@
+<style lang="less">
+.container {
+  width: 100%;
+  height: 100%;
+  background: #f8f8f9;
+}
+.album {
+  width: 100%;
+  height: 100%;
+  margin-top: 11.7rpx;
+  background: #f8f8f9;
+}
+.tab {
+  background: #f8f8f9;
+}
+.each_album {
+  float: left;
+  margin: 12rpx;
+  width: 350rpx;
+  height: 462rpx;
+  background: #f8f8f9;
+}
+.header {
+  width: 350rpx;
+  height: 350rpx;
+}
+.footer {
+  position: absolute;
+  width: 350rpx;
+  height: 117rpx;
+}
+.avatar {
+  float: left;
+  margin: 20rpx;
+}
+.textt {
+  position: inherit;
+  width: 170rpx;
+  height: 80rpx;
+  font-size: 30rpx;
+  margin-left: 115rpx;
+  margin-top: 20rpx;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  color: #495060;
+}
+.add {
+  width: 350rpx;
+  height: 350rpx;
+  margin: 11.7rpx;
+  float: left;
+  background: #dddee1;
+}
+.delete {
+  width: auto;
+  height: auto;
+  position: absolute;
+}
+.addd {
+  margin: 117rpx;
+}
+.float-button {
+  float: right;
+  background-color: #f8f8f9;
+  position: fixed;
+  bottom: 200rpx;
+  right: 20rpx;
+  border: 0 solid #f8f8f9;
+  border-radius: 200rpx;
+}
+.icone {
+  margin-left: 175rpx;
+  margin-top: 30rpx;
+  background: #dddee1;
+  border-radius: 50%;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+}
+.not_open {
+  padding: 20rpx;
+  background: #f8f8f9;
+  font-size: 34rpx;
+  color: #495060;
+}
+</style>
+<template>
+  <view class="container">
+    <view class="tab">
+      <i-tabs current="{{ current }}" bindchange="handleChange">
+        <i-tab key="tab1" title="群相册"></i-tab>
+        <i-tab key="tab2" title="我的相册"></i-tab>
+        <i-tab key="tab3" title="最近浏览"></i-tab>
+      </i-tabs>
+    </view>
+    <!-- 群相册 -->
+    <view class="album" hidden="{{!(current == 'tab1')}}">
+      <repeat for="{{albums}}" key="index" index="index" item="item">
+        <view class="each_album">
+          <view class="header" style="background-image: url({{item.cover}}); background-size: cover; background-repeat: no-repeat, repeat; max-size: 350rpx 350rpx;" bindtap="short_touch( {{item.albumID}} )">
+          </view>
+          <view class="footer">
+            <i-avatar src="{{ item.createrAvatarUrl }}" size="default" i-class="avatar"></i-avatar>
+            <view class="textt"> {{ item.albumTitle }} </view>
+            <i-icon type="switch" i-class="icone" size="25" bindtap="more_op( {{item.albumID}} )"/>
+          </view>
+        </view>
+      </repeat>
+      <i-icon type="add" size="35" class="float-button" bindtap="addAlbum"/> <!-- 悬浮按钮 -->
+    </view>
+    <!-- 群相册 -->
+
+    <!-- 我的相册 -->
+    <view class="album" hidden="{{!(current == 'tab2')}}">
+      <repeat for="{{myAlbums}}" key="index" index="index" item="item">
+        <view class="each_album">
+          <view class="header" style="background-image: url({{item.cover}}); background-size: cover; background-repeat: no-repeat, repeat; max-size: 350rpx 350rpx;" bindtap="short_touch( {{item.albumID}} )" bindlongtap="longpress" bindtouchstart="touch_start" bindtouchend="touch_end">
+          </view>
+          <view class="footer">
+            <i-avatar src="{{ item.createrAvatarUrl }}" size="default" i-class="avatar"></i-avatar>
+            <view class="textt"> {{ item.albumTitle }} </view>
+            <i-icon type="switch" i-class="icone" size="25" bindtap="more_op( {{item.albumID}} )"/>
+          </view>
+
+        </view>
+      </repeat>
+      <i-icon type="add" size="35" class="float-button" bindtap="addAlbum"/>
+    </view>
+    <!-- 我的相册 -->
+
+    <view class="album" hidden="{{!(current == 'tab3')}}">
+      <view class="not_open">暂未开放</view>
+    </view>
+
+    <i-modal title="重命名" visible="{{ editVisible }}" bind:ok="handleEditSubmit" bind:cancel="handleEditClose">
+      <input value="{{ currentAlbumTitle }}" bindinput="handleAlbumTitleChange" placeholder="请输入相册名称"/>
+    </i-modal>
+    <i-action-sheet visible="{{ actionsVisible }}" actions="{{ actions }}" show-cancel bind:cancel="handleActionCancel" bind:click="handleActionClick" />
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/utils/api';
+import image from '@/utils/image';
+import _ from 'lodash';
+
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '群相册',
+    usingComponents: {
+      'i-avatar': '../../iview/avatar/index',
+      'i-icon': '../../iview/icon/index',
+      'i-tabs': '../../iview/tabs/index',
+      'i-tab': '../../iview/tab/index',
+      'i-action-sheet': '../../iview/action-sheet/index',
+      'i-modal': '../iview/modal/index',
+      'i-input': '../iview/input/index',
+      'i-panel': '../iview/panel/index'
+    },
+    enablePullDownRefresh: true
+  };
+  components = {};
+
+  data = {
+    from: -1,
+    albums: [],
+    myAlbums: [],
+    current: 'tab1',
+    editVisible: false,
+    currentAlbumTitle: '',
+    actionsCurrentAlbumID: null,
+    actionsVisible: false,
+    actions: [
+      {
+        id: 'del',
+        name: '删除',
+        icon: 'trash',
+        openType: 'trash_fill'
+      },
+      {
+        id: 'edit',
+        name: '重命名',
+        icon: 'createtask',
+        openType: 'createtask_fill'
+      }
+    ]
+  };
+
+  computed = {};
+
+  methods = {
+    async handleChange({ detail }) {
+      this.current = detail.key;
+    },
+
+    handleActionClick({ detail }) {
+      const id = this.actions[detail.index].id;
+      if (id === 'del') {
+        this.deleteAlbum(this.actionsCurrentAlbumID);
+      } else if (id === 'edit') {
+        this.editAlbum(this.actionsCurrentAlbumID);
+      }
+      this.actionsVisible = false;
+    },
+    handleActionCancel() {
+      this.actionsVisible = false;
+    },
+    more_op(albumID) {
+      this.actionsCurrentAlbumID = albumID;
+      this.actionsVisible = true;
+    },
+
+    short_touch(albumID) {
+      wepy.navigateTo({
+        url: '/pages/album_detail?album_id=' + albumID
+      });
+    },
+
+    addAlbum() {
+      wepy.navigateTo({
+        url: '/pages/album_add'
+      });
+    },
+
+    // 相册重命名
+    handleAlbumTitleChange(e) {
+      this.currentAlbumTitle = e.detail.value;
+    },
+    handleEditClose() {
+      this.editVisible = false;
+    },
+    async handleEditSubmit() {
+      this.editVisible = false;
+      await api.authRequest({
+        url: 'updateAlbum',
+        method: 'POST',
+        data: {
+          openGID: await this.$parent.fetchOpenGID(),
+          albumTitle: this.currentAlbumTitle,
+          albumID: this.actionsCurrentAlbumID
+        }
+      }, false);
+      this.refreshAlbumList();
+    }
+  };
+  async deleteAlbum(albumID) {
+    let album = _.find(this.albums, x => x.albumID === albumID);
+    if (!album || album.createrOpenID !== this.$parent.globalData.openID) {
+      await wepy.showModal({
+        title: '错误',
+        content: '你没有删除该相册的权限',
+        showCancel: false
+      });
+      return;
+    }
+    let res = await wepy.showModal({
+      title: '提醒',
+      content: '是否删除该相册'
+    });
+    if (res.confirm) {
+      await api.authRequest({
+        url: 'deleteAlbum',
+        method: 'POST',
+        data: {
+          openGID: await this.$parent.fetchOpenGID(),
+          albumID: albumID
+        }
+      });
+      this.$apply();
+      this.refreshAlbumList();
+    }
+  }
+  async editAlbum(albumID) {
+    let album = _.find(this.albums, x => x.albumID === albumID);
+    if (!album || album.createrOpenID !== this.$parent.globalData.openID) {
+      await wepy.showModal({
+        title: '错误',
+        content: '你没有修改该相册的权限',
+        showCancel: false
+      });
+      return;
+    }
+    this.currentAlbumTitle = album.albumTitle;
+    this.editVisible = true;
+    this.$apply();
+  }
+
+  onPullDownRefresh() {
+    wepy.stopPullDownRefresh();
+    this.refreshAlbumList();
+  }
+
+  async refreshAlbumList() {
+    wepy.showNavigationBarLoading();
+    let res = await api.authRequest(
+      {
+        url: 'listAlbum',
+        method: 'POST',
+        data: {
+          openGID: await this.$parent.fetchOpenGID()
+        }
+      },
+      false
+    );
+    this.albums = res.data.albums;
+    let myAlbums = [];
+    for (let album of this.albums) {
+      if (album.createrOpenID === this.$parent.globalData.openID) {
+        myAlbums.push(album);
+      }
+      if (album.images.length > 0) {
+        album.cover = await image.getUrl(album.images[0].key);
+      } else {
+        album.cover = 'http://221.182.165.54:8206/Content/images/暂无图片.jpg';
+      }
+    }
+    this.myAlbums = myAlbums;
+    // console.log(this.myAlbums);
+    this.$apply();
+    wepy.hideNavigationBarLoading();
+  }
+
+  onShareAppMessage(options) {
+    return {
+      title: '大家快来看群相册',
+      path: '/pages/album_list',
+      imageUrl: '/images/logo.png'
+    };
+  }
+
+  async onShow() {
+    if (
+      !await this.$parent.authorizeRequired() ||
+      !await this.$parent.groupRequired()
+    ) {
+      return;
+    }
+    wepy.showShareMenu({
+      withShareTicket: true
+    });
+    this.refreshAlbumList();
+  }
+  async onLoad(options) {
+    this.from = options.from;
+    if (this.from === '1') {
+      // console.log(this.from);
+      this.current = 'tab2';
+    }
+  }
+}
+</script>

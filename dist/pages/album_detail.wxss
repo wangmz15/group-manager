@@ -1,0 +1,93 @@
+.album {
+  width: 100%;
+  height: 100%;
+  margin-top: 11.7rpx;
+}
+.each_album {
+  float: left;
+  margin: 12rpx;
+  width: 350rpx;
+  height: 450rpx;
+  background: #f8f8f9;
+}
+.header {
+  width: 350rpx;
+  height: 350rpx;
+}
+.footer {
+  position: absolute;
+  width: 350rpx;
+  height: auto;
+  float: left;
+}
+.textt {
+  position: inherit;
+  width: 250rpx;
+  height: 80rpx;
+  font-size: 30rpx;
+  margin-left: 20rpx;
+  margin-top: 20rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  color: #495060;
+}
+.icone {
+  margin-left: 280rpx;
+  margin-top: 20rpx;
+  background: #dddee1;
+  border-radius: 50%;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+}
+.add {
+  width: 350rpx;
+  height: 350rpx;
+  margin: 11.7rpx;
+  float: left;
+  background: #dddee1;
+}
+.delete {
+  width: auto;
+  height: auto;
+  position: absolute;
+}
+.addd {
+  margin: 117rpx;
+}
+.parent {
+  margin: auto;
+}
+.child {
+  box-sizing: border-box;
+  background-color: yellow;
+  width: 240rpx;
+  height: 400rpx;
+  margin: 5rpx;
+  float: left;
+}
+.image {
+  box-sizing: border-box;
+  margin: 5rpx;
+  width: 225rpx;
+  height: 225rpx;
+}
+.edit-image {
+  box-sizing: border-box;
+  margin: 10rpx;
+  width: 150rpx;
+  height: 150rpx;
+}
+.add-icon {
+  margin: 70rpx;
+}
+.float-button {
+  float: right;
+  background-color: #f8f8f9;
+  position: fixed;
+  bottom: 200rpx;
+  right: 20rpx;
+  border: 0 solid #f8f8f9;
+  border-radius: 200rpx;
+}

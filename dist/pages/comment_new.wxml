@@ -1,0 +1,27 @@
+
+  <view class="main">
+    <i-panel title="{{ type === 'post' ? '评论' : '回复'}}">
+      <textarea class="textarea" bindinput="handleContentInput" placeholder="请输入回复内容" placeholder-class="textarea-placeholder" value="{{content}}"/>
+    </i-panel>
+    
+  <i-panel>
+    <view class="toolbar">
+    <i-icon  wx:if="{{$toolbar$showEmoji}}" i-class="toolbar-icon" size="25" color="#999" type="emoji" bindtap="$toolbar$handleEmoji"/>
+    <i-icon  wx:if="{{$toolbar$showPicture}}" i-class="toolbar-icon" size="25" color="#999" type="picture" bindtap="$toolbar$handlePicture"/>
+    <view class="toolbar-textright">
+        <text wx:if="{{$toolbar$showPreview}}" class="toolbar-textbtn {{ $toolbar$previewDisable ? 'toolbar-textbtn-disable': '' }}" bindtap="$toolbar$handlePreview">预览</text>
+        <text wx:if="{{$toolbar$showSubmit}}" class="toolbar-textbtn {{ $toolbar$submitDisable ? 'toolbar-textbtn-disable' : '' }}" bindtap="$toolbar$handleSubmit">发表</text>
+    </view>
+    </view>
+  </i-panel>
+
+
+    <view  wx:if="{{showEmojis}}" class="emojis_box">
+      <view class="emoji_wrap" wx:for="{{emojiList}}" wx:key="key">
+        <image catchtap="clickEmoji" src="{{item.img}}" data-key="{{item.key}}" class="emoji"/>
+      </view>
+      <!-- <view class="emoji_wrap">
+        <text catchtap="sendMsg" class="emoji_send">发送</text>
+      </view> -->
+    </view>
+  </view>

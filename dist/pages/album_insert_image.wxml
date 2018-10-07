@@ -1,0 +1,18 @@
+
+    <view class="container">
+      <i-panel>
+        <input class="image-description-input" bindinput="handleDescChange" placeholder="给这组照片起个名字吧"/>
+      </i-panel>
+      <i-panel>
+        <block wx:for="{{images}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+          <view class="image-content">
+            <text class="image-delete-btn" bindtap="handleDelete" data-wpyhandledelete-a="{{ item.key }}"/>
+            <image src="{{ item.url }}"/>
+          </view>
+        </block>
+        <view class="image-content image-add-btn">
+          <image src="/images/plus.png" bindtap="addImages"/>
+        </view>
+      </i-panel>
+      <i-button  bind:click="handleSubmit" type="primary">上传</i-button>
+    </view>

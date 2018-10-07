@@ -1,0 +1,51 @@
+page {
+  background-color: #f8f8f8;
+}
+.inremind {
+  margin: 20rpx;
+  background: #ffffff;
+}
+.title {
+  font-size: 34rpx;
+  text-align: center;
+  color: #393938;
+}
+.description {
+  font-size: 25rpx;
+  color: #a8a8a8;
+  padding-right: 20rpx;
+  float: right;
+}
+.uploader {
+  font-size: 25rpx;
+  color: #a8a8a8;
+  padding-left: 20rpx;
+  padding-top: 20rpx;
+}
+.rowstart {
+  width: 90%;
+}
+.content {
+  font-size: 30rpx;
+  margin-top: 15rpx;
+  margin-left: 30rpx;
+  margin-bottom: 15rpx;
+  width: 90%;
+  color: #4b4b48;
+  text-indent: 60rpx;
+  line-height: 40rpx;
+}
+.float-button {
+  float: right;
+  background-color: white;
+  position: fixed;
+  bottom: 200rpx;
+  right: 20rpx;
+  border: 0 solid #ffffff;
+  border-radius: 200rpx;
+}
+.emoji {
+  width: 35rpx;
+  height: 35rpx;
+  margin-top: 15rpx;
+}

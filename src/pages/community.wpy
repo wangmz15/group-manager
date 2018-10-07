@@ -1,0 +1,203 @@
+<style lang="less">
+page {
+  background-color: #f8f8f8;
+}
+.inremind {
+  margin: 20rpx;
+  background: #ffffff;
+}
+.title {
+  // margin-top: 20rpx;
+  // margin-left: 20rpx;
+  font-size: 34rpx;
+  text-align: center;
+  color: hsl(60, 1%, 22%);
+}
+.description {
+  font-size: 25rpx;
+  color: #a8a8a8;
+  padding-right: 20rpx;
+  float: right;
+}
+.uploader {
+  font-size: 25rpx;
+  color: #a8a8a8;
+  padding-left: 20rpx;
+  padding-top: 20rpx;
+  // float: left;
+}
+.rowstart {
+  width: 90%;
+}
+.content {
+  font-size: 30rpx;
+  margin-top: 15rpx;
+  margin-left: 30rpx;
+  margin-bottom: 15rpx;
+  width: 90%;
+  color: hsl(60, 2%, 29%);
+  text-indent: 60rpx;
+  line-height: 40rpx;
+}
+.float-button {
+  float: right;
+  background-color: white;
+  position: fixed;
+  bottom: 200rpx;
+  right: 20rpx;
+  border: 0 solid #ffffff;
+  border-radius: 200rpx;
+}
+.emoji {
+  width: 35rpx;
+  height: 35rpx;
+  margin-top: 15rpx;
+  // background: #1f5dd1;
+}
+</style>
+
+<template>
+  <view>
+    <view wx:if="{{ from == '0' }}">
+      <repeat for="{{postList}}" key="index" index="index" item="item">
+        <view class="inremind" bindtap="bindShowDetail({{item.postID}})">
+          <i-row i-class="rowstart">
+            <i-row i-class="uploader">
+              <i-avatar src="{{ item.authorAvatarUrl }}" size="mini" i-class="avatar"></i-avatar> {{item.authorNickName}} {{item.createdAt}}
+            </i-row>
+          </i-row>
+          <i-row i-class="title">{{item.postTitle}}</i-row>
+          <i-row i-class="content">
+            {{item.postContent}}
+          </i-row>
+          <i-row>
+            <i-row  i-class="description">浏览({{item.viewerNumber}})</i-row>
+          </i-row>
+        </view>
+      </repeat>
+      <i-icon type="add" size="35" class="float-button" bindtap="addPost"/>
+    </view>
+
+    <view wx:if="{{ from == '1' || from === '2' }}">
+      <repeat for="{{myPostList}}" key="index" index="index" item="item">
+        <view class="inremind" bindtap="bindShowDetail({{item.postID}})">
+          <i-row i-class="rowstart">
+            <i-row i-class="uploader">
+              <i-avatar src="{{ item.authorAvatarUrl }}" size="mini" i-class="avatar"></i-avatar> {{item.authorNickName}} {{item.createdAt}}
+            </i-row>
+           
+          </i-row>
+          <i-col span="24" i-class="title">{{item.postTitle}}</i-col>
+          <i-row i-class="content">
+            <text >{{item.postContent}}</text>
+          </i-row>
+          
+          <i-row>
+            <i-row  i-class="description">浏览({{item.viewerNumber}})</i-row>
+          </i-row>
+        </view>
+      </repeat>
+      <i-icon type="add" size="35" class="float-button" bindtap="addPost"/>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/utils/api';
+import time from '@/utils/time';
+
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '社区',
+    usingComponents: {
+      'i-panel': '../iview/panel/index',
+      'i-button': '../iview/button/index',
+      'i-row': '../iview/row/index',
+      'i-col': '../iview/col/index',
+      'i-card': '../iview/card/index',
+      'i-input': '../iview/input/index',
+      'i-cell-group': '../iview/cell-group/index',
+      'i-icon': '../iview/icon/index',
+      'i-avatar': '../iview/avatar/index'
+    },
+    enablePullDownRefresh: true
+  };
+
+  data = {
+    postList: [],
+    myPostList: [],
+    from: '0',
+    contentList: []
+  };
+
+  methods = {
+    addPost() {
+      wepy.navigateTo({
+        url: '/pages/post_new'
+      });
+    },
+    bindShowDetail(postID) {
+      wepy.navigateTo({
+        url: '/pages/post_detail?post_id=' + postID
+      });
+    }
+  };
+
+  onLoad(options) {
+    this.from = options.from;
+    // console.log(this.from);
+  }
+
+  onPullDownRefresh() {
+    wepy.stopPullDownRefresh();
+    this.refreshPostList();
+  }
+
+  onShareAppMessage(options) {
+    return {
+      title: '大家快来社区一起讨论吧',
+      path: `/pages/community?openGID=${this.$parent.globalData.openGID}`,
+      imageUrl: '/images/logo.png'
+    };
+  }
+
+  async onShow() {
+    if (
+      !await this.$parent.authorizeRequired() ||
+      !await this.$parent.groupRequired()
+    ) {
+      return;
+    }
+    wepy.showShareMenu({
+      withShareTicket: true
+    });
+    this.refreshPostList();
+  }
+
+  async refreshPostList() {
+    wepy.showNavigationBarLoading();
+    let ans = await api.authRequest(
+      {
+        url: 'fetchPostList',
+        method: 'POST',
+        data: {
+          openGID: await this.$parent.fetchOpenGID()
+        }
+      },
+      false
+    );
+
+    this.postList = ans.data.postList;
+    this.postList.forEach(async element => {
+      element.postContent = element.postContent.slice(0, 100);
+      element.createdAt = await time.getTime(element.createdAt);
+      this.$apply();
+    });
+    let myPostList = ans.data.postList.filter(post => post.authorOpenID === this.$parent.globalData.openID);
+    this.myPostList = myPostList;
+    this.$apply();
+    wepy.hideNavigationBarLoading();
+  }
+}
+</script>

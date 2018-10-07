@@ -1,0 +1,397 @@
+<style lang="less">
+.album {
+  width: 100%;
+  height: 100%;
+  margin-top: 11.7rpx;
+}
+.each_album {
+  float: left;
+  margin: 12rpx;
+  width: 350rpx;
+  height: 450rpx;
+  background: #f8f8f9;
+}
+.header {
+  width: 350rpx;
+  height: 350rpx;
+  
+}
+.footer {
+  // background:black;
+  position: absolute;
+  width: 350rpx;
+  height: auto;
+  float: left;
+}
+.textt {
+  position: inherit;
+  width: 250rpx;
+  height: 80rpx;
+  font-size: 30rpx;
+  margin-left: 20rpx;
+  margin-top: 20rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  color: #495060;
+}
+.icone {
+  margin-left: 280rpx;
+  margin-top: 20rpx;
+  background: #dddee1;
+  border-radius: 50%;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+}
+.add {
+  width: 350rpx;
+  height: 350rpx;
+  margin: 11.7rpx;
+  float: left;
+  background: #dddee1;
+}
+.delete {
+  width: auto;
+  height: auto;
+  position: absolute;
+}
+.addd {
+  margin: 117rpx;
+}
+.parent {
+  //   width: 95%;
+  margin: auto;
+  //   background-color: black;
+  //   display: flex;
+  //   flex-direction: row;
+  //   flex-wrap: wrap;
+  //   align-content: flex-start;
+  //   align-content: flex-start;
+  //  display:flex;
+}
+.child {
+  box-sizing: border-box;
+  background-color: yellow;
+  width: 240rpx;
+  height: 400rpx;
+  margin: 5rpx;
+  //   align-self: auto;
+  //   margin-left: 20rpx;
+  //   border: 3px solid red;
+  //   margin-right: 10rpx;
+  float: left;
+}
+.image {
+  box-sizing: border-box;
+  //   background-color: white;
+  margin: 5rpx;
+  width: 225rpx;
+  height: 225rpx;
+  // width: 100rpx;
+  // height: 100rpx;
+  //   border: 3px solid red;
+}
+.edit-image {
+  box-sizing: border-box;
+  //   background-color: white;
+  margin: 10rpx;
+  width: 150rpx;
+  height: 150rpx;
+  //   border: 3px solid red;
+}
+.add-icon {
+  //   background-color: red;
+  //   border: 3px solid peru;
+  margin: 70rpx;
+}
+.float-button {
+  float: right;
+  background-color: #f8f8f9;
+  position: fixed;
+  bottom: 200rpx;
+  right: 20rpx;
+  border: 0 solid #f8f8f9;
+  border-radius: 200rpx;
+}
+</style>
+
+<template>
+    <view>
+        <view wx:if="{{!isChoose}}">
+          <view class="album">
+            <repeat for="{{album.images}}" key="index" index="index" item="item">
+              <view class="each_album">
+                <view class="header" style="background-image: url({{item.url}}); background-size: cover; background-repeat: no-repeat, repeat; max-size: 350rpx 350rpx;" bindtap="previewImage({{ item.key }})" bindlongpress="handleLongPress">
+                </view>
+                <view class="footer">
+                  <view class="textt"> {{ item.description }} </view>
+                  <i-icon type="switch" i-class="icone" size="25" bindtap="more_op( {{item.key}} )"/>
+                </view>
+              </view>
+            </repeat>
+          </view>
+          <i-icon type="add" size="35" class="float-button" bindtap="addImage"/>
+        </view>
+
+        <!-- 多选视图 -->
+        <view wx:if="{{isChoose}}" class='parent'>
+                <checkbox-group current="{{current}}" bindchange='handleChoiseChange'>
+                    <checkbox class='edit-child' wx:for="{{album.images}}" value="{{item.key}}" checked="{{item.checked}}">
+                        <image class='edit-image' src="{{item.url}}" />
+                    </checkbox>
+                </checkbox-group>
+            <view class="text-center">
+                <button bindtap="handleCancelMulti" size="mini" inline>取消</button>
+                <button bindtap="handleDeleteMulti" size="mini" type='warn' disabled='{{disabled}}' inline>删除</button>
+            </view>
+        </view>
+
+        <i-action-sheet visible="{{ actionsVisible }}" actions="{{ actions }}" show-cancel bindcancel="handleActionCancel" bindclick="handleActionClick" />
+
+        <i-modal title="删除确认" visible="{{ confirmVisiable }}" actions="{{ confirmActions }}" bind:click="handleDelete">
+            <view>删除后无法恢复哦</view>
+        </i-modal>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/utils/api';
+import image from '@/utils/image';
+import _ from 'lodash';
+
+// FIXME 空值检查
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '查看相册',
+    usingComponents: {
+      'i-panel': '../iview/panel/index',
+      'i-button': '../iview/button/index',
+      'i-row': '../iview/row/index',
+      'i-col': '../iview/col/index',
+      'i-cell-group': '../iview/cell-group/index',
+      'i-cell': '../iview/cell/index',
+      'i-grid': '../iview/grid/index',
+      'i-icon': '../iview/icon/index',
+      'i-checkbox': '../iview/checkbox/index',
+      'i-checkbox-group': '../iview/checkbox-group/index',
+      'i-modal': '../iview/modal/index',
+      'i-action-sheet': '../iview/action-sheet/index',
+      'i-avatar': '../iview/avatar/index'
+    },
+    enablePullDownRefresh: true
+  };
+
+  components = {};
+
+  data = {
+    albumID: null,
+    album: null,
+    isChoose: false,
+    current: [],
+    disabled: true,
+    actionsCurrentImageKey: null,
+    confirmActions: [
+      {
+        id: 'cancel',
+        name: '取消'
+      },
+      {
+        id: 'confirm',
+        name: '删除',
+        color: '#ed3f14',
+        loading: false
+      }
+    ],
+    confirmVisiable: false,
+    actionsVisible: false,
+    actions: [
+      {
+        id: 'del',
+        name: '删除',
+        icon: 'trash',
+        openType: 'trash_fill'
+      },
+      {
+        id: 'multi',
+        name: '多选',
+        icon: 'other',
+        openType: 'other'
+      }
+    ]
+  };
+
+  methods = {
+    // 预览图片
+    previewImage(imageKey) {
+      let current = _.find(this.album.images, x => x.key === imageKey).url;
+      let imgListUrl = this.album.images.map(x => x.url);
+      wepy.previewImage({
+        current: current, // 当前显示图片的http链接
+        urls: imgListUrl // 需要预览的图片http链接列表
+      });
+    },
+
+    handleActionClick({ detail }) {
+      let id = this.actions[detail.index].id;
+      this.actionsVisible = false;
+      if (id === 'del') {
+        this.confirmVisiable = true;
+      } else if (id === 'multi') {
+        this.isChoose = true;
+      }
+    },
+    handleActionCancel() {
+      this.actionsVisible = false;
+    },
+    handleDelete({ detail }) {
+      let id = this.confirmActions[detail.index].id;
+      if (id === 'confirm') {
+        this.deleteImages(this.current);
+      }
+      this.confirmVisiable = false;
+      this.isChoose = false;
+    },
+
+    more_op(imageKey) {
+      this.actionsCurrentImageKey = imageKey;
+      this.current = [imageKey];
+      this.actionsVisible = true;
+    },
+    handleChoiseChange(e) {
+      // console.log('handleChoiseChange');
+      // console.log(e.detail.value);
+      if (e.detail.value.length === 0) {
+        // console.log('empty');
+        this.disabled = true;
+      } else {
+        // console.log('not empty');
+        this.disabled = false;
+      }
+      this.current = e.detail.value;
+      // console.log(this.current);
+    },
+    handleLongPress: function(event) {
+      this.isChoose = true;
+    },
+    handleCancelMulti() {
+      this.isChoose = false;
+    },
+    handleDeleteMulti() {
+      this.confirmVisiable = true;
+    },
+
+    // 上传图片
+    async addImage() {
+      wepy.navigateTo({
+        url: '/pages/album_insert_image?album_id=' + this.albumID
+      });
+    },
+
+    handleCancle() {
+      this.isChoose = false;
+    },
+    handleChoose() {
+      this.isChoose = true;
+    }
+  };
+
+  // 批量删除图片
+  async deleteImages(keys) {
+    let images = this.album.images.filter(x => keys.indexOf(x.key) !== -1);
+    if (images.length === 0) {
+      await wepy.showModal({
+        title: '错误',
+        content: '待删除的图片列表为空',
+        showCancel: false
+      });
+      return;
+    }
+
+    if (
+      this.album.createrOpenID !== this.$parent.globalData.openID &&
+      _.some(images, x => x.uploaderOpenID !== this.$parent.globalData.openID)
+    ) {
+      await wepy.showModal({
+        title: '错误',
+        content: '你不具有删除这些图片的权限',
+        showCancel: false
+      });
+      return;
+    }
+    await api.authRequest({
+      url: 'deleteAlbumImages',
+      method: 'POST',
+      data: {
+        openGID: await this.$parent.fetchOpenGID(),
+        albumID: this.albumID,
+        images: images.map(x => x.key)
+      }
+    });
+    this.refreshImages();
+  }
+
+  onPullDownRefresh() {
+    wepy.stopPullDownRefresh();
+    this.refreshImages();
+  }
+
+  onLoad(options) {
+    this.albumID = options.album_id;
+  }
+
+  onShareAppMessage(options) {
+    return {
+      title: '我分享了一个群相册：' + this.album.albumTitle,
+      path: `/pages/album_detail?openGID=${this.$parent.globalData.openGID}&album_id=${this.albumID}`,
+      imageUrl: '/images/logo.png'
+    };
+  }
+
+  async onShow(options) {
+    if (
+      !await this.$parent.authorizeRequired() ||
+      !await this.$parent.groupRequired()
+    ) {
+      return;
+    }
+    wepy.showShareMenu({
+      withShareTicket: true
+    });
+    this.refreshImages();
+  }
+
+  async refreshImages() {
+    wepy.showNavigationBarLoading();
+    let ans = await api.authRequest(
+      {
+        url: 'singleAlbum',
+        method: 'POST',
+        data: {
+          openGID: await this.$parent.fetchOpenGID(),
+          albumID: this.albumID
+        },
+        methods: 'POST'
+      },
+      false
+    );
+    if (ans.data.success === -1) {
+      await wepy.showModal({
+        title: '错误',
+        content: '该相册已删除',
+        showCancel: false
+      });
+      wepy.navigateBack();
+      return;
+    }
+    this.album = ans.data;
+    await image.fixImagesUrls(this.album.images);
+    wepy.hideNavigationBarLoading();
+    wepy.setNavigationBarTitle({
+      title: '群相册：' + this.album.albumTitle
+    });
+    this.$apply();
+  }
+}
+</script>

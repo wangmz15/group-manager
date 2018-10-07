@@ -1,0 +1,454 @@
+<style lang="less">
+page {
+  background-color: #f8f8f8;
+}
+.remind {
+  width: 100%;
+  height: auto;
+  float: left;
+  margin-top: 20rpx;
+  background: #f8f8f8;
+}
+.inremind {
+  padding: 20rpx;
+  background: #ffffff;
+}
+.title {
+  text-align: left;
+  margin-left: 34rpx;
+  font-size: 34rpx;
+  color: hsl(60, 1%, 22%);
+  font-weight: 600;
+}
+.description {
+  font-size: 25rpx;
+  color: #a8a8a8;
+  margin-right: 10rpx;
+  float: right;
+}
+.uploader {
+  font-size: 25rpx;
+  color: #a8a8a8;
+}
+.rowstart {
+  margin-top: 5rpx;
+}
+.content {
+  font-size: 32rpx;
+  margin-top: 40rpx;
+  margin-left: 34rpx;
+  width: 90%;
+  color: hsl(60, 2%, 29%);
+}
+////////////
+.comments {
+  width: 750rpx;
+  height: auto;
+  background: #f8f8f9;
+}
+.title1 {
+  padding-left: 20rpx;
+  padding-top: 20rpx;
+  text-align: left;
+  font-size: 30rpx;
+}
+.comment_list {
+  background: white;
+  width: 750rpx;
+  height: auto;
+  font-size: 34rpx;
+}
+.main_com {
+  width: 750rpx;
+  height: auto;
+  margin-top: 5rpx;
+}
+.avatar {
+  margin: 20rpx;
+}
+.nickname {
+  width: 100%;
+  color: #5cadff;
+}
+.detail_comment {
+  color: hsl(60, 2%, 29%);
+  padding-left: 100rpx;
+  padding-right: 34rpx;
+  font-size: 30rpx;
+}
+.footer {
+  /*background: blue;*/
+  height: 50rpx;
+  position: inherit;
+  margin-top: 20rpx;
+  margin-left: 100rpx;
+  font-size: 24rpx;
+  color: hsl(60, 2%, 29%);
+}
+.time {
+  position: inherit;
+  float: left;
+  width: 400rpx;
+}
+.ico {
+  float: left;
+  width: 100rpx;
+  margin-left: 20rpx;
+}
+.ico1 {
+  float: left;
+  width: 100rpx;
+}
+.repeat {
+  /*background: red;*/
+  margin-top: 10rpx;
+  padding-bottom: 20rpx;
+  margin-left: 100rpx;
+  padding-right: 40rpx;
+  color: hsl(60, 2%, 29%);
+  font-size: 30rpx;
+}
+.each_repeat {
+  margin-top: 10rpx;
+  margin-bottom: 5rpx;
+}
+.repeat_sum {
+  padding-top: 5rpx;
+  padding-bottom: 5rpx;
+  color: #5cadff;
+}
+.dorepeat {
+  width: 100%;
+  height: auto;
+  margin-top: 20rpx;
+}
+.emoji {
+width: 35rpx;
+height: 35rpx;
+margin-top: 15rpx;
+// background: #1f5dd1;
+}
+
+</style>
+
+<template>
+    <view>
+      <view class="inremind">
+        <i-row i-class="rowstart">
+          <i-col span="24" i-class="uploader" >
+            <i-avatar src="{{ authorAvatarUrl }}" size="mini" i-class="avatar"></i-avatar> {{authorNickName}} {{createdAt}}
+            <view style="float: right;padding-top: 20rpx;"><i-icon wx:if="{{ editable }}" type="more" size="25" bindtap="more_op"/></view>
+          </i-col>
+        </i-row>
+        <i-row i-class='title'>{{postTitle}}</i-row>
+        <i-row i-class="content">
+          <view class="rich-text-wrp">
+            <rich-text nodes="{{ postContentNodes }}"></rich-text>
+          </view>
+        </i-row>
+        <i-row i-class="rowend">
+          <br/>
+          <i-row  i-class="description">浏览({{viewerNumber}})</i-row>
+        </i-row>
+      </view>
+      <i-action-sheet visible="{{ actionsVisible }}" actions="{{ actions }}" show-cancel bind:cancel="handleActionCancel" bind:click="handleActionClick" />
+
+      <view class="comments">
+        <view class="title1">
+          <text>所有评论</text>
+        </view>
+        <repeat for="{{comments}}" key="index" index="index" item="each">
+          <view class="comment_list">
+            <!--需要对前端进行区分-->
+            <view class="main_com">
+              <i-avatar i-class="avatar" src="{{each.avatarUrl}}" size="default" bindtap="user"></i-avatar>
+              <text class="nickname" bindtap="user">{{each.nickName}}</text>
+              <view class="detail_comment">
+                <rich-text nodes="{{ each.commentContentNodes }}"></rich-text>
+              </view>
+              <view class="footer">
+                <view class="time"><text>{{each.commentCreatedAt}}</text></view>
+                <view class="ico" catchtap="like({{index}})" data-idd="{{each.commentID}}">
+                  <i-icon type="{{each.ilike?'praise_fill':'praise'}}" size="20"/>
+                  {{each.likeNum}}
+                </view>
+                <view class="ico1" bindtap="do_comment('comment', {{each.commentID}})">
+                  <i-icon size="20" type="message" />
+                  {{each.subcomments.length}}
+                </view>
+              </view>
+            </view>
+            <!--需要对前端进行区分-->
+            <view class="repeat">
+              <repeat for="{{each.subcomments_short}}" key="index" index="index" item="item">
+                <view class="each_repeat" bindtap="do_comment('subcomment', {{each.commentID}}, {{item.openID}})">
+                  <text class="nickname" catchtap="user">{{item.nickName}}: </text>
+                  <text hidden="{{!item.replyNickname}}">回复:</text>
+                  <text class="nickname" hidden="{{!item.replyNickname}}" catchtap="user">{{item.replyNickname}}:</text>
+                  <text>{{ item.commentContent }}</text>
+                </view>
+              </repeat>
+              <view wx:if="{{each.subcomments.length>2}}" class="repeat_sum" bindtap="lookCom({{each.commentID}})">共{{each.subcomments.length}}条评论</view>
+            </view>
+          </view>
+        </repeat>
+        <view class="dorepeat" bindtap="do_comment('post', {{postID}})">
+          <i-input value="" disabled="true"  mode="normal" placeholder="评论点什么吧：" />
+        </view>
+      </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/utils/api';
+import render from '@/utils/render';
+import time from '@/utils/time';
+
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '社区',
+    usingComponents: {
+      'i-panel': '../iview/panel/index',
+      'i-button': '../iview/button/index',
+      'i-row': '../iview/row/index',
+      'i-col': '../iview/col/index',
+      'i-card': '../iview/card/index',
+      'i-input': '../iview/input/index',
+      'i-cell-group': '../iview/cell-group/index',
+      'i-avatar': '../iview/avatar/index',
+      'i-icon': '../iview/icon/index',
+      'i-action-sheet': '../../iview/action-sheet/index'
+    },
+    enablePullDownRefresh: true
+  };
+
+  components = {};
+
+  data = {
+    postID: null,
+    postTitle: '',
+    postContent: '',
+    postContentNodes: [],
+    viewerNumber: -1,
+    createdAt: '',
+    authorAvatarUrl: '',
+    authorNickName: '',
+    authorOpenID: '',
+    comments: [],
+    actions: [
+      {
+        id: 'del',
+        name: '删除',
+        icon: 'trash',
+        openType: 'trash_fill'
+      },
+      {
+        id: 'edit',
+        name: '编辑',
+        icon: 'createtask',
+        openType: 'createtask_fill'
+      }
+    ],
+    actionsVisible: false
+  };
+
+  computed = {
+    editable() {
+      return this.authorOpenID === this.$parent.globalData.openID;
+    }
+  };
+
+  methods = {
+    more_op() { // 操作
+      this.actionsVisible = true;
+    },
+    handleActionClick({ detail }) {
+      const id = this.actions[detail.index].id;
+      if (id === 'del') {
+        this.deletePost();
+      } else if (id === 'edit') {
+        this.editPost();
+      }
+      this.actionsVisible = false;
+    },
+    handleActionCancel() {
+      this.actionsVisible = false;
+    },
+
+    async user() {
+      // 进入用户信息界面
+      console.log('您点击了用户头像');
+    },
+    async do_comment(type, ID, replyOpenID) {
+      // 进行评论,type=post:评论文章,type=comment:对评论进行评论,type=subcomment:对楼中楼评论
+      console.log('开始评论');
+      console.log(type, ID, replyOpenID);
+      // 通过id表示是对谁进行评论
+      wepy.navigateTo({
+        url: '/pages/comment_new?type=' + type + '&ID=' + ID + '&replyOpenID=' + replyOpenID
+      });
+    },
+    async lookCom(commentID) {
+      // 打开评论列表
+      console.log('打开评论列表');
+      wepy.navigateTo({
+        url: '/pages/comment_detail?type=post&ID=' + this.postID + '&commentID=' + commentID
+      });
+    },
+    async like(index) {
+      // 点赞
+      console.log('点赞1');
+      console.log(index);
+      console.log(this.comments[index]);
+      this.comments[index].ilike = !this.comments[index].ilike;
+      var iflike = this.comments[index].ilike;
+      console.log(this.comments[index].ilike);
+      var thiscommentID = this.comments[index].commentID;
+      console.log(thiscommentID);
+      if (iflike) {
+        await api.authRequest({
+          url: 'commentLike',
+          method: 'POST',
+          data: {
+            openGID: await this.$parent.fetchOpenGID(),
+            commentID: thiscommentID
+          }
+        });
+      } else {
+        await api.authRequest({
+          url: 'commentUnlike',
+          method: 'POST',
+          data: {
+            openGID: await this.$parent.fetchOpenGID(),
+            commentID: thiscommentID
+          }
+        });
+      }
+      this.getCommentList();
+      this.$apply();
+    }
+  };
+
+  async deletePost() {
+    await api.authRequest({
+      url: 'deletePost',
+      method: 'POST',
+      data: {
+        openGID: await this.$parent.fetchOpenGID(),
+        postID: this.postID
+      }
+    });
+    await wepy.showModal({
+      title: '成功',
+      content: '删除帖子成功',
+      showConcel: false
+    });
+    wepy.navigateBack();
+  }
+
+  async editPost() {
+    wepy.navigateTo({
+      url: '/pages/post_new?action=edit&post_id=' + this.postID
+    });
+  }
+
+  onLoad(options) {
+    console.log('/pages/post_id onLoad:');
+    this.postID = options.post_id;
+  }
+
+  onPullDownRefresh() {
+    wepy.stopPullDownRefresh();
+    this.refreshPost();
+  }
+
+  onShareAppMessage(options) {
+    return {
+      title: '我分享了一篇帖子：' + this.postTitle,
+      path: `/pages/post_detail?openGID=${this.$parent.globalData.openGID}&post_id=${this.postID}`,
+      imageUrl: '/images/logo.png'
+    };
+  }
+
+  async onShow() {
+    if (
+      !await this.$parent.authorizeRequired() ||
+      !await this.$parent.groupRequired()
+    ) {
+      return;
+    }
+    wepy.showShareMenu({
+      withShareTicket: true
+    });
+    this.refreshPost();
+  }
+
+  async getCommentList() {
+    wepy.showNavigationBarLoading();
+    let res = await api.authRequest({
+      url: 'getComments',
+      method: 'POST',
+      data: {
+        fieldID: this.postID,
+        fieldType: 'post',
+        openGID: await this.$parent.fetchOpenGID()
+      }
+    }, false);
+    this.comments = res.data.commentList;
+    for (let item of this.comments) {
+      item.commentContentNodes = await render(item.commentContent);
+    }
+    // 时间格式转换
+    // commentCreatedAt function one
+    for (var j = 0, len = this.comments.length; j < len; j++) {
+      this.comments[j].commentCreatedAt = await time.getTime(this.comments[j].commentCreatedAt);
+    }
+    for (let comment of this.comments) {
+      comment.subcomments_short = comment.subcomments.slice(0, 2);
+    }
+    this.$apply();
+    wepy.hideNavigationBarLoading();
+  }
+
+  async refreshPost() {
+    wepy.showNavigationBarLoading();
+    let ans = await api.authRequest({
+      url: 'postDetail',
+      method: 'POST',
+      data: {
+        openGID: await this.$parent.fetchOpenGID(),
+        postID: this.postID
+      }
+    }, false);
+    if (ans.data.success === -1) {
+      await wepy.showModal({
+        title: '错误',
+        content: '该帖子已删除',
+        showCancel: false
+      });
+      wepy.navigateBack();
+      return;
+    }
+    this.postTitle = ans.data.postTitle;
+    wepy.setNavigationBarTitle({
+      title: '帖子：' + this.postTitle
+    });
+
+    this.postContent = ans.data.postContent;
+    this.postContentNodes = await render(this.postContent, ans.data.images);
+    this.viewerNumber = ans.data.viewerNumber;
+    this.createdAt = ans.data.createdAt;
+    this.createdAt = await time.getTime(this.createdAt);
+    this.authorAvatarUrl = ans.data.authorAvatarUrl;
+    this.authorNickName = ans.data.authorNickName;
+    this.authorOpenID = ans.data.authorOpenID;
+    this.$apply();
+
+    // 获取评论
+    this.getCommentList();
+
+    wepy.hideNavigationBarLoading();
+  }
+}
+</script>

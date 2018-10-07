@@ -1,0 +1,290 @@
+<style lang="less">
+.comments {
+  width: 750rpx;
+  height: auto;
+  background: #f8f8f9;
+}
+.title {
+  width: 750rpx;
+  height: auto;
+  padding-top: 30rpx;
+  padding-left: 30rpx;
+  padding-bottom: 30rpx;
+}
+.comment_list {
+  background: white;
+  width: 750rpx;
+  height: auto;
+  font-size: 34rpx;
+}
+.main_com {
+  width: 750rpx;
+  height: auto;
+  margin-top: 5rpx;
+}
+.footer {
+  width: 100%;
+  height: 50rpx;
+  margin-top: 20rpx;
+  margin-left: 100rpx;
+  font-size: 24rpx;
+}
+.avatar {
+  margin: 20rpx;
+}
+.nickname {
+  width: 100%;
+  color: #5cadff;
+}
+.detail_comment {
+  margin-left: 100rpx;
+  margin-right: 34rpx;
+  font-size: 32rpx;
+  line-height: 45rpx;
+  color: #495060;
+}
+.time {
+  height: 50rpx;
+  width: 400rpx;
+  position: inherit;
+  float: left;
+}
+.ico {
+  float: left;
+  width: 100rpx;
+  margin-left: 120rpx;
+}
+.ico1 {
+  float: left;
+  width: 100rpx;
+  margin-left: 100rpx;
+}
+.repeat {
+  padding-left: 30rpx;
+  padding-right: 34rpx;
+  background: #f8f8f9;
+}
+.call {
+  margin-left: 20rpx;
+  margin-right: 20rpx;
+  font-size: 30rpx;
+}
+.dorepeat {
+  position: relative;
+  width: 100%;
+  height: auto;
+  margin-top: 20rpx;
+  bottom: 0rpx;
+}
+.emoji {
+  width: 35rpx;
+  height: 35rpx;
+  margin-top: 15rpx;
+  // background: #1f5dd1;
+}
+</style>
+<template>
+  <view>
+      <view class="comments">
+        <view class="title">
+          <text>评论详情</text>
+        </view>
+
+        <view class="comment_list">
+          <!-- 主楼 -->
+          <view class="main_com">
+            <i-avatar i-class="avatar" src="{{ comment.avatarUrl }}" size="default"></i-avatar>
+            <text class="nickname" bindtap="user">{{ comment.nickName }}</text>
+            <view class="detail_comment">
+              <rich-text nodes="{{ comment.commentContentNodes }}"></rich-text>
+            </view>
+            <view class="footer">
+              <view class="time"><text>{{commentCreatedAt}}</text></view>
+              <view class="ico" bindtap="like1">
+                <i-icon type="{{comment.ilike?'praise_fill':'praise'}}" size="20"/>
+                {{comment.likeNum}}
+              </view>
+            </view>
+          </view>
+          <!-- 楼中楼 -->
+          <repeat for="{{ comment.subcomments }}" key="index" index="index" item="item">
+            <view class="repeat">
+              <i-avatar i-class="avatar" src="{{ item.avatarUrl }}" size="small"></i-avatar>
+              <text class="nickname" bindtap="user">{{ item.nickName }}</text>
+              <text class="call" hidden="{{!item.replyOpenID}}">回复:</text>
+              <text class="nickname" bindtap="user" hidden="{{!item.replyOpenID}}">{{ item.replyNickname }}</text>
+              <view class="detail_comment" bindtap="do_comment('subcomment', {{commentID}}, {{item.openID}})">
+                <text>{{ item.commentContent }}</text>
+              </view>
+              <view class="footer">
+                <view class="time"><text>{{ item.updatedAt }}</text></view>
+                <view class="ico1" bindtap="like({{index}})">
+                  <i-icon type="{{item.ilike?'praise_fill':'praise'}}" size="18"/>
+                  {{item.likeNum}}
+                </view>
+              </view>
+            </view>
+          </repeat>
+        </view>
+
+        <view class="dorepeat" bindtap="do_comment('comment', {{commentID}})">
+           <i-input disabled="true"  mode="normal" placeholder="回复楼主：" />
+        </view>
+      </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import _ from 'lodash';
+import api from '@/utils/api';
+import render from '@/utils/render';
+import time from '@/utils/time';
+
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '评论',
+    usingComponents: {
+      'i-avatar': '../../iview/avatar/index',
+      'i-icon': '../../iview/icon/index',
+      'i-tabs': '../../iview/tabs/index',
+      'i-tab': '../../iview/tab/index',
+      'i-input': '../../iview/input/index'
+    },
+    enablePullDownRefresh: true
+  };
+  components = {};
+
+  data = {
+    type: null,
+    ID: null,
+    commentID: null,
+    comment: null,
+    commentCreatedAt: ''
+  };
+
+  computed = {};
+
+  methods = {
+    async user() {
+      // 进入用户信息界面
+      // console.log('您点击了用户头像');
+    },
+    async do_comment(type, ID, replyOpenID) {
+      // 进行评论,type=post:评论文章,type=comment:对评论进行评论,type=subcomment:对楼中楼评论
+      // console.log('开始评论');
+      // console.log(type, ID, replyOpenID);
+      // 通过id表示是对谁进行评论
+      wepy.navigateTo({
+        url: '/pages/comment_new?type=' + type + '&ID=' + ID + '&replyOpenID=' + replyOpenID
+      });
+    },
+    async like1() {
+      // 点赞
+      // console.log('点赞1');
+      this.comment.ilike = !this.comment.ilike;
+      var iflike = this.comment.ilike;
+      var thiscommentID = this.comment.commentID;
+      // console.log(thiscommentID);
+      if (iflike) {
+        await api.authRequest({
+          url: 'commentLike',
+          method: 'POST',
+          data: {
+            openGID: await this.$parent.fetchOpenGID(),
+            commentID: thiscommentID
+          }
+        });
+      } else {
+        await api.authRequest({
+          url: 'commentUnlike',
+          method: 'POST',
+          data: {
+            openGID: await this.$parent.fetchOpenGID(),
+            commentID: thiscommentID
+          }
+        });
+      }
+      this.refreshComment();
+    },
+    async like(index) {
+      // 点赞
+      // console.log('点赞2');
+      // console.log(index);
+      this.comment.subcomments[index].ilike = !this.comment.subcomments[index].ilike;
+      var iflike = this.comment.subcomments[index].ilike;
+      var thiscommentID = this.comment.subcomments[index].commentID;
+      // console.log(thiscommentID);
+      if (iflike) {
+        await api.authRequest({
+          url: 'commentLike',
+          method: 'POST',
+          data: {
+            openGID: await this.$parent.fetchOpenGID(),
+            commentID: thiscommentID
+          }
+        });
+      } else {
+        await api.authRequest({
+          url: 'commentUnlike',
+          method: 'POST',
+          data: {
+            openGID: await this.$parent.fetchOpenGID(),
+            commentID: thiscommentID
+          }
+        });
+      }
+      this.refreshComment();
+    }
+  };
+
+  onLoad(options) {
+    this.type = options.type;
+    this.ID = options.ID;
+    this.commentID = options.commentID;
+  }
+
+  async onShow() {
+    if (
+      !await this.$parent.authorizeRequired() ||
+      !await this.$parent.groupRequired()
+    ) {
+      return;
+    }
+    wepy.hideShareMenu();
+    this.refreshComment();
+  }
+
+  onPullDownRefresh() {
+    wepy.stopPullDownRefresh();
+    this.refreshComment();
+  }
+
+  async refreshComment() {
+    wepy.showNavigationBarLoading();
+    let res = await api.authRequest(
+      {
+        url: 'getComments',
+        method: 'POST',
+        data: {
+          fieldID: this.ID,
+          fieldType: this.type,
+          openGID: await this.$parent.fetchOpenGID()
+        }
+      },
+      false
+    );
+    this.comment = _.find(
+      res.data.commentList,
+      x => parseInt(x.commentID) === parseInt(this.commentID)
+    );
+    this.comment.commentContentNodes = await render(this.comment.commentContent);
+    this.commentCreatedAt = await time.getTime(this.comment.commentCreatedAt);
+    for (var j = 0, len = this.comment.subcomments.length; j < len; j++) {
+      this.comment.subcomments[j].updatedAt = await time.getTime(this.comment.subcomments[j].updatedAt);
+    }
+    this.$apply();
+    wepy.hideNavigationBarLoading();
+  }
+}
+</script>

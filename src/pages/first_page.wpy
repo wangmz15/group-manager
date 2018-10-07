@@ -1,0 +1,501 @@
+<style lang="less">
+.main {
+  background: #f8f8f9;
+  font-size: 34rpx;
+  color: #495060;
+}
+.header {
+  width: 100%;
+  background: white;
+}
+.title {
+  float: clear;
+  height: 100rpx;
+  font-size: 34rpx;
+  color: #495060;
+}
+.title_text {
+  font-weight: bold;
+  line-height: 100rpx;
+}
+.notice {
+  width: 700rpx;
+  height: auto;
+  margin-top: 20rpx;
+  padding-left: 25rpx;
+  padding-right: 25rpx;
+  padding-bottom: 10rpx;
+  background: white;
+}
+.notice_content {
+  width: 700rpx;
+  height: auto;
+}
+.album_background {
+  // height: 360rpx;
+    width: 700rpx;
+  padding-left: 25rpx;
+  padding-bottom: 10rpx;
+  padding-right: 25rpx;
+  margin-top: 20rpx;
+  background: white;
+}
+.album_one {
+  float: left;
+  width: 215rpx;
+  height: 215rpx;
+  margin-top: 15rpx;
+  margin-left: 17rpx;
+}
+.album_info {
+  padding-left: 40rpx;
+  padding-top: 80rpx;
+}
+.weekly {
+  width: 700rpx;
+  height: auto;
+  padding-left: 25rpx;
+  padding-right: 25rpx;
+  background: white;
+  margin-top: 20rpx;
+}
+.ico {
+  text-align: center;
+  font-size: 30rpx;
+  color: #80848f;
+}
+.post_list {
+  color: #495060;
+  padding-bottom: 10rpx;
+}
+.post_each {
+  // margin-top: 20rpx;
+  margin-bottom: 20rpx;
+  padding-left: 25rpx;
+  padding-right: 25rpx;
+}
+.post_empty {
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+.emoji {
+  width: 35rpx;
+  height: 35rpx;
+  margin-top: 15rpx;
+}
+.field {
+  width: 700rpx;
+  height: auto;
+  padding-left: 25rpx;
+  padding-right: 25rpx;
+  background: white;
+  margin-top: 20rpx;
+}
+.activity {
+  color: #495060;
+  // background: #19be6b;
+}
+.inremind {
+  padding-left: 20rpx;
+  padding-right: 20rpx;
+}
+.avatar {
+  float: left;
+  width: 30%;
+  margin: 20rpx;
+}
+.text {
+  width: 100%;
+  padding-top: 24rpx;
+  font-size: 30rpx;
+  color: #80848f;
+}
+.separator {
+  height: 2rpx;
+  width: 100%;
+  margin-top: 2rpx;
+  margin-bottom: 2rpx;
+  background: #f8f8f9;
+}
+.activity_detail {
+  margin-top: 20rpx;
+  margin-bottom: 20rpx;
+  margin-left: 100rpx;
+  margin-right: 20rpx;
+}
+.description {
+  font-size: 25rpx;
+  color: #a8a8a8;
+  margin-right: 20rpx;
+  float: right;
+}
+.spin {
+  padding-top: 20rpx;
+  padding-bottom: 20rpx;
+}
+.noAlbum {
+  margin-bottom: 20rpx;
+  padding-left: 25rpx;
+  padding-right: 25rpx;
+  text-align: center;
+}
+.album {
+  width: 700rpx;
+  height: 300rpx;
+}
+</style>
+
+<template>
+  <view class="main">
+    <view class="header">
+      <i-row>
+          <i-col span="8" i-class="ico"><i-icon  color="#2d8cf0" type="document_fill" size="25"  bindtap="handleWeekly"/> </i-col>
+          <i-col span="8" i-class="ico"><i-icon  color="#2d8cf0" type="interactive" size="25"  bindtap="handleNotice"/> </i-col>
+          <i-col span="8" i-class="ico"><i-icon  color="#2d8cf0" type="picture_fill" size="25"  bindtap="handleAlbum"/> </i-col>
+      </i-row>
+      <i-row>
+          <i-col span="8" i-class="ico">社区</i-col>
+          <i-col span="8" i-class="ico">公告</i-col>
+          <i-col span="8" i-class="ico">相册</i-col>
+      </i-row>
+    </view>
+    <view class="notice"  bindtap="handleNotice">
+      <view class="title">
+        <i-icon type="systemprompt" size="27" color="#2d8cf0"/>
+        <text class="title_text">通告栏</text>
+      </view>
+      <view class="noAlbum" wx:if="{{ notices.length === 0 }}">
+        暂无公告
+      </view>
+      <view class="notice_content" wx:if="{{ notices.length >= 1 }}">
+        <i-notice-bar>
+            {{notices[0].noticeTitle}}
+        </i-notice-bar>
+      </view>
+      <view wx:if="{{ notices.length > 1 }}" class="separator"></view>
+      <view class="notice_content" wx:if="{{ notices.length > 1 }}">
+        <i-notice-bar>
+            {{notices[1].noticeTitle}}
+        </i-notice-bar>
+      </view>
+    </view>
+    <view class="album_background" bindtap="handleAlbum" >
+      <view class="title">
+        <i-icon type="picture" size="27" color="#2d8cf0"/>
+        <text class="title_text">相册</text>
+      </view>
+      <view wx:if="{{ albums.length == 0 }}" class='noAlbum'>
+        暂无相册
+      </view>
+      <view wx:if="{{ albums.length > 0 }}" class='album'>
+        <repeat for="{{albums}}" key="index" index="index" item="item">
+          <view class="album_one" style="background-image: url({{item.cover}}); background-size: cover; background-repeat: no-repeat, repeat; max-size: 215rpx 215rpx;"></view>
+        </repeat> 
+      </view>
+    </view>
+    <view class="weekly" bindtap="handleWeekly">
+      <view class="title">
+        <i-icon type="activity" size="27" color="#2d8cf0"/>
+        <text class="title_text">帖子</text>
+      </view>
+      <view class="post_list">
+        <view class="post_empty" wx:if="{{posts.length === 0}}">
+          暂无帖子
+        </view>
+        <view class="post_each" wx:if="{{posts.length > 0}}">
+          <i-icon type="enter" size="20"/>
+          {{posts[0].postTitle}}
+        </view>
+        <view class="separator" wx:if="{{posts.length > 1}}"></view>
+        <view class="post_each" wx:if="{{posts.length > 1}}">
+          <i-icon type="enter" size="20"/>
+          {{posts[1].postTitle}}
+        </view>
+        <view class="separator" wx:if="{{posts.length > 2}}"></view>
+        <view class="post_each" wx:if="{{posts.length > 2}}">
+          <i-icon type="enter" size="20"/>
+          {{posts[2].postTitle}}
+        </view>
+      </view>
+    </view>
+    <view class="field">
+      <view class="title">
+        <i-icon type="picture" size="28" color="#2d8cf0"/>
+        <text class="title_text">动态</text>
+      </view>
+      <repeat for="{{activities}}" key="index" index="index" item="item">
+        <view>
+          <i-row i-class="activity" bindtap="handleActivity({{item.activityID}}, {{item.activityContent}})">
+              <i-avatar src="{{ item.authorAvatarUrl }}" size="mini" i-class="avatar"></i-avatar>
+              <view class="text">{{item.showText}}</view>
+              <view class="activity_detail">{{item.activityTitle}}</view>
+              <view class='description'>{{item.createdAt}}</view>
+          </i-row>
+        </view>
+        <view class="separator"></view>
+      </repeat>
+      <view hidden="{{fieldnew}}">
+        <i-spin custom i-class="spin">加载中...</i-spin>
+      </view>
+      <view hidden="{{!fieldnew}}">
+        <i-divider  color="#2d8cf0" lineColor="#bbbec4">加载已经完成,没有其他数据</i-divider>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import image from '@/utils/image';
+import api from '@/utils/api';
+import time from '@/utils/time';
+
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '首页',
+    usingComponents: {
+      'i-panel': '../iview/panel/index',
+      'i-button': '../iview/button/index',
+      'i-row': '../iview/row/index',
+      'i-col': '../iview/col/index',
+      'i-card': '../iview/card/index',
+      'i-input': '../iview/input/index',
+      'i-cell-group': '../iview/cell-group/index',
+      'i-cell': '../iview/cell/index',
+      'i-icon': '../iview/icon/index',
+      'i-avatar': '../iview/avatar/index',
+      'i-tab-bar': '../iview/tab-bar/index',
+      'i-tab-bar-item': '../iview/tab-bar-item/index',
+      'i-notice-bar': '../iview/notice-bar/index',
+      'i-toast': '../iview/toast/index',
+      'i-spin': '../iview/spin/index',
+      'i-divider': '../iview/divider/index'
+    },
+    enablePullDownRefresh: true
+  };
+  components = {};
+
+  methods = {
+    async handleActivity(activityID, activityContent) {
+      switch (activityContent) {
+        case 'album':
+          wepy.navigateTo({
+            url: '/pages/album_detail?album_id=' + activityID
+          });
+          break;
+        case 'notice':
+          wepy.navigateTo({
+            url: '/pages/notice_detail?notice_id=' + activityID
+          });
+          break;
+        default:
+          wepy.navigateTo({
+            url: '/pages/post_detail?post_id=' + activityID
+          });
+          break;
+      }
+    },
+    async handleNotice() {
+      wepy.navigateTo({
+        url: '/pages/notice_list'
+      });
+    },
+    async handleWeekly() {
+      wepy.switchTab({
+        url: '/pages/community?from=' + '0'
+      });
+    },
+    async handleAlbum() {
+      wepy.navigateTo({
+        url: '/pages/album_list'
+      });
+    }
+  };
+
+  data = {
+    picSign: null,
+    notices: [],
+    albums: [],
+    posts: [],
+    activities: [],
+    sumofrefresh: 0,
+    time: null,
+    currentac: [],
+    fieldnew: false
+  };
+
+  onShareAppMessage(options) {
+    return {
+      title: '乐享个人体验',
+      path: '/pages/first_page',
+      imageUrl: '/images/logo.png'
+    };
+  }
+
+  async onShow() {
+    if (
+      !await this.$parent.authorizeRequired() ||
+      !await this.$parent.groupRequired()
+    ) {
+      return;
+    }
+    wepy.showShareMenu({
+      withShareTicket: true
+    });
+    this.refreshHomepage();
+    this.refreshField();
+  }
+
+  onPullDownRefresh() {
+    wepy.stopPullDownRefresh();
+    this.refreshHomepage();
+    this.refreshField();
+  }
+
+  onReachBottom() {
+    console.log('上拉刷新');
+    console.log(this.sumofrefresh);
+    this.refreshField();
+    this.sumofrefresh = this.sumofrefresh + 1;
+    this.$apply();
+  }
+
+  async refreshField() {
+    // 获取新的activity给curreetac
+    let res = await api.authRequest(
+      {
+        url: 'allActivities',
+        method: 'POST',
+        data: {
+          openGID: await this.$parent.fetchOpenGID(),
+          refreshTime: this.time,
+          refreshSum: this.sumofrefresh
+        }
+      },
+      false
+    );
+    console.log(res.data.success);
+    let success = res.data.success;
+    if (success === -1) {
+      console.log('null');
+      this.fieldnew = true;
+      this.$apply();
+      return;
+    }
+    if (res.data.activities.length < 10)
+      this.fieldnew = true;
+    res.data.activities.forEach(element => {
+      element.createdAt = time.getTime(element.createdAt);
+      element.showText =
+        element.authorNickName +
+        (element.activityType === 'create' ? '创建了' : '修改了');
+      switch (element.activityContent) {
+        case 'album':
+          element.showText += '相册';
+          break;
+        case 'post':
+          element.showText += '帖子';
+          break;
+        default:
+          element.showText += '公告';
+          break;
+      }
+    });
+    this.currentac = res.data.activities;
+    // console.log('当前');
+    // console.log(this.currentac);
+    // currentac 附加给 activities 更新页面
+    this.activities = this.activities.concat(this.currentac);
+    this.$apply();
+  }
+
+  async refreshHomepage() {
+    wepy.showNavigationBarLoading();
+    /* 获取当前去年时间 */
+    var timestamp = Date.parse(new Date());
+    timestamp = timestamp / 1000;
+    console.log('当前时间戳为：' + timestamp);
+    this.sumofrefresh = 0;
+    this.fieldnew = false;
+    this.time = timestamp;
+    //  mew
+    let noticeRes = await api.authRequest(
+      {
+        url: 'listNotice',
+        method: 'POST',
+        data: {
+          openGID: await this.$parent.fetchOpenGID()
+        }
+      },
+      false
+    );
+    this.notices = noticeRes.data.notices;
+    // console.log(this.notices);
+    this.$apply();
+
+    let albumRes = await api.authRequest(
+      {
+        url: 'listAlbum',
+        method: 'POST',
+        data: {
+          openGID: await this.$parent.fetchOpenGID()
+        }
+      },
+      false
+    );
+    this.albums = albumRes.data.albums.filter(x => x.images.length > 0);
+    for (let album of this.albums) {
+      album.cover = await image.getUrl(album.images[0].key);
+    }
+    this.albums = this.albums.slice(0, 3);
+    this.$apply();
+
+    let postsRes = await api.authRequest(
+      {
+        url: 'fetchPostList',
+        method: 'POST',
+        data: {
+          openGID: await this.$parent.fetchOpenGID()
+        }
+      },
+      false
+    );
+    this.posts = postsRes.data.postList;
+
+    let activities = await api.authRequest(
+      {
+        url: 'allActivities',
+        method: 'POST',
+        data: {
+          openGID: await this.$parent.fetchOpenGID(),
+          refreshTime: this.time,
+          refreshSum: this.sumofrefresh
+        }
+      },
+      false
+    );
+    // console.log(activities);
+    activities.data.activities.forEach(element => {
+      element.createdAt = time.getTime(element.createdAt);
+      element.showText =
+        element.authorNickName +
+        (element.activityType === 'create' ? '创建了' : '修改了');
+      switch (element.activityContent) {
+        case 'album':
+          element.showText += '相册';
+          break;
+        case 'post':
+          element.showText += '帖子';
+          break;
+        default:
+          element.showText += '公告';
+          break;
+      }
+    });
+    this.activities = activities.data.activities;
+    // console.log(this.activities);
+    this.$apply();
+    wepy.hideNavigationBarLoading();
+  }
+}
+</script>

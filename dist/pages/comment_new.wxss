@@ -1,0 +1,49 @@
+@import "./../components/toolbar.wxss";
+page {
+  background-color: #fafafa;
+}
+.main {
+  padding-top: 50rpx;
+  background-color: #fff;
+}
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px;
+  font-size: 14px;
+}
+.textarea-placeholder {
+  font-size: 14px;
+}
+.emojis_box {
+  background: #fff;
+  border-top: 1px solid #ccc;
+  height: 150px;
+  padding: 10px 25rpx;
+  display: flex;
+  flex-flow: row wrap;
+  align-content: flex-start;
+}
+.emoji_wrap {
+  flex: 0 0 100rpx;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.emoji {
+  width: 70rpx;
+  height: 70rpx;
+}
+.emoji_wrap .emoji {
+  padding: 5px;
+}
+.emoji_send {
+  color: #fff;
+  background: #1aad19;
+  border-radius: 5px;
+  font-size: 9pt;
+  width: 100%;
+  text-align: center;
+  padding: 5px 0;
+}

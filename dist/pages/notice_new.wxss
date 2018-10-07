@@ -1,0 +1,17 @@
+@import "./../components/toolbar.wxss";
+page {
+  background-color: #fafafa;
+}
+.main {
+  padding-top: 50rpx;
+  background-color: #fff;
+}
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px;
+  font-size: 14px;
+}
+.textarea-placeholder {
+  font-size: 14px;
+}

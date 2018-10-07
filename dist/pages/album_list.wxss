@@ -1,0 +1,86 @@
+.container {
+  width: 100%;
+  height: 100%;
+  background: #f8f8f9;
+}
+.album {
+  width: 100%;
+  height: 100%;
+  margin-top: 11.7rpx;
+  background: #f8f8f9;
+}
+.tab {
+  background: #f8f8f9;
+}
+.each_album {
+  float: left;
+  margin: 12rpx;
+  width: 350rpx;
+  height: 462rpx;
+  background: #f8f8f9;
+}
+.header {
+  width: 350rpx;
+  height: 350rpx;
+}
+.footer {
+  position: absolute;
+  width: 350rpx;
+  height: 117rpx;
+}
+.avatar {
+  float: left;
+  margin: 20rpx;
+}
+.textt {
+  position: inherit;
+  width: 170rpx;
+  height: 80rpx;
+  font-size: 30rpx;
+  margin-left: 115rpx;
+  margin-top: 20rpx;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  color: #495060;
+}
+.add {
+  width: 350rpx;
+  height: 350rpx;
+  margin: 11.7rpx;
+  float: left;
+  background: #dddee1;
+}
+.delete {
+  width: auto;
+  height: auto;
+  position: absolute;
+}
+.addd {
+  margin: 117rpx;
+}
+.float-button {
+  float: right;
+  background-color: #f8f8f9;
+  position: fixed;
+  bottom: 200rpx;
+  right: 20rpx;
+  border: 0 solid #f8f8f9;
+  border-radius: 200rpx;
+}
+.icone {
+  margin-left: 175rpx;
+  margin-top: 30rpx;
+  background: #dddee1;
+  border-radius: 50%;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+}
+.not_open {
+  padding: 20rpx;
+  background: #f8f8f9;
+  font-size: 34rpx;
+  color: #495060;
+}

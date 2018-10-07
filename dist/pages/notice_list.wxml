@@ -1,0 +1,26 @@
+
+    <view>
+      <block wx:for="{{notices}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+        <view class="inremind" bindtap="bindShowDetail" data-wpybindshowdetail-a="{{item.noticeID}}">
+          <i-row i-class="rowstart">
+            <i-col span="22" i-class="uploader">
+              <i-avatar src="{{item.authorAvatarUrl}}" size="mini" i-class="avatar"/> {{item.authorNickName}}
+            </i-col>
+            <i-col span="1" i-class="demo-badge"><i-badge dot="dot"  wx:if="{{(!item.readed)&&(from == 0)&&(item.authorOpenID !== openID)}}"/></i-col>
+            
+          </i-row>
+
+          <i-row span="24" i-class="title">{{item.noticeTitle}}</i-row>
+          
+          <i-row>
+            <i-col span="20" i-class="description">
+              <text style="margin-left: 20rpx;">{{item.createdAt}}</text>
+            </i-col>
+            <i-col span="4" i-class="description">
+              <text style="margin-right: 10rpx;">已读({{item.viewerNumber}})</text>
+            </i-col>
+          </i-row>
+        </view>
+      </block>
+      <i-icon type="add" size="35" class="float-button" bindtap="addNotice"/>
+    </view>

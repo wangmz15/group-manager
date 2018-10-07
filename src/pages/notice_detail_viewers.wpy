@@ -1,0 +1,96 @@
+<style lang="less">
+@import url(../less/notice);
+</style>
+
+<template>
+  <view class="container">
+    <view class="notice_header">
+      <view class="notice_title">
+        {{ notice.noticeTitle || '加载中...' }}
+      </view>
+      <view class="notice_author">
+        <view wx:if="{{ notice }}">
+          {{ notice.authorNickName }} 发布于 {{ notice.createdAt }}
+        </view>
+        <view wx:else>
+          加载中...
+        </view>
+      </view>
+    </view>
+    <view i-class="viewers-list">
+      <repeat for="{{notice.viewers}}" key="index" index="index" item="item">
+        <i-panel i-class="content">
+          <i-avatar src="{{ item.avatarUrl }}" size="large"></i-avatar>
+          {{ item.nickName }}
+        </i-panel>
+      </repeat>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import refreshNoticeMixin from '@/mixins/refresh_notice';
+
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '加载中...',
+    usingComponents: {
+      'i-panel': '../iview/panel/index',
+      'i-button': '../iview/button/index',
+      'i-row': '../iview/row/index',
+      'i-col': '../iview/col/index',
+      'i-card': '../iview/card/index',
+      'i-input': '../iview/input/index',
+      'i-cell-group': '../iview/cell-group/index',
+      'i-cell': '../iview/cell/index',
+      'i-avatar': '../iview/avatar/index'
+    },
+    enablePullDownRefresh: true
+  };
+  components = {};
+
+  methods = {};
+
+  mixins = [refreshNoticeMixin];
+
+  onLoad(options) {
+    // console.log('/pages/notice_detail_viewers onLoad:');
+    // console.log(options);
+    this.noticeID = options.notice_id;
+  }
+
+  async onShow() {
+    if (
+      !await this.$parent.authorizeRequired() ||
+      !await this.$parent.groupRequired()
+    ) {
+      return;
+    }
+    await wepy.hideShareMenu();
+    if (!this.noticeID) {
+      await wepy.showModal({
+        title: '未知错误',
+        content: '发送未知错误',
+        showCancel: false
+      });
+      wepy.navigateBack();
+    } else {
+      await this.refreshNotice();
+      await wepy.setNavigationBarTitle({
+        title: this.notice.noticeTitle + ':查看过的人'
+      });
+    }
+  }
+
+  onPullDownRefresh() {
+    wepy.stopPullDownRefresh();
+    this.refreshNotice();
+  }
+
+  data = {
+    noticeID: null,
+    notice: null
+  };
+}
+</script>

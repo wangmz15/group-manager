@@ -1,0 +1,274 @@
+<style lang="less">
+page {
+  background-color: rgb(250, 250, 250);
+}
+.main {
+  padding-top: 50rpx;
+  background-color: #fff;
+}
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px;
+  font-size: 14px;
+}
+.textarea-placeholder {
+  font-size: 14px;
+}
+.emojis_box {
+  background: #fff;
+  border-top: 1px solid #ccc;
+  height: 150px;
+  padding: 10px 25rpx;
+  display: flex;
+  flex-flow: row wrap;
+  align-content: flex-start;
+}
+
+.emoji_wrap {
+  flex: 0 0 100rpx;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emoji {
+  width: 70rpx;
+  height: 70rpx;
+}
+.emoji_wrap .emoji {
+  padding: 5px;
+}
+
+.emoji_send {
+  color: #fff;
+  background: #1aad19;
+  border-radius: 5px;
+  font-size: 9pt;
+  width: 100%;
+  text-align: center;
+  padding: 5px 0;
+}
+
+.picture-content {
+  position: relative;
+  display: inline-block;
+  width: 116rpx;
+  height: 116rpx;
+  margin: 5px 5rpx;
+  padding: 0;
+}
+.picture-content image {
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.picture-add-btn {
+  background-color: rgba(170, 170, 170, 0.5);
+}
+</style>
+
+<template>
+  <view class="main">
+    <i-panel title="帖子标题">
+      <i-input value="{{ title }}" bind:change='handleTitleChange' type="text" placeholder="请输入标题(最多20字)" maxlength="20"></i-input>
+    </i-panel>
+    <i-panel title="帖子内容">
+      <textarea value="{{ content }}" class="textarea" bindinput="handleContentInput" maxlength="-1" placeholder-class="textarea-placeholder"></textarea>
+    </i-panel>
+    <toolbar
+      left="emoji|picture" right="submit"
+      :submitDisable.sync="submitdisable"
+      @emoji.user="handleEmoji" @picture.user="handlePicture" @submit.user="handleSubmit"></toolbar>
+
+    <view wx:if="{{toolarea === 'emoji'}}" class="emojis_box">
+      <view class="emoji_wrap" wx:for="{{emojiList}}" wx:key="key">
+        <image catchtap="clickEmoji" src="{{item.img}}" data-key="{{item.key}}" class="emoji"/>
+      </view>
+    </view>
+    <view wx:if="{{toolarea === 'picture'}}">
+      <repeat for="{{images}}" key="index" index="index" item="item">
+        <view class="picture-content">
+          <image src="{{ item.url }}"/>
+        </view>
+      </repeat>
+      <view class="picture-content picture-add-btn">
+        <image src="/images/plus.png" bindtap="addPicture"/>
+      </view>
+    </view>
+    
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import Toolbar from '@/components/toolbar';
+import api from '@/utils/api';
+import image from '@/utils/image';
+const { emojis, emojiToPath } = require('../utils/emojis');
+
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '发表帖子',
+    usingComponents: {
+      'i-panel': '../iview/panel/index',
+      'i-button': '../iview/button/index',
+      'i-row': '../iview/row/index',
+      'i-col': '../iview/col/index',
+      'i-card': '../iview/card/index',
+      'i-input': '../iview/input/index',
+      'i-cell-group': '../iview/cell-group/index',
+      'i-cell': '../iview/cell/index',
+      'i-icon': '../iview/icon/index'
+    }
+  };
+  components = {
+    toolbar: Toolbar
+  };
+
+  data = {
+    action: 'new', // new/edit,
+    postID: null,
+    title: '',
+    content: '',
+    toolarea: 'none', // emoji, picture
+    emojiList: [],
+    images: []
+  };
+
+  computed = {
+    submitdisable() {
+      return !(this.title && this.content);
+    }
+  };
+
+  methods = {
+    // 点击表情
+    clickEmoji: function(e) {
+      const { key } = e.currentTarget.dataset;
+      this.content = this.content + key;
+      this.$apply();
+    },
+    handleTitleChange(target) {
+      this.title = target.detail.detail.value;
+    },
+    handleContentInput(e) {
+      this.content = e.detail.value;
+    },
+    handleEmoji() {
+      if (this.toolarea === 'emoji') this.toolarea = 'none';
+      else this.toolarea = 'emoji';
+    },
+    handlePicture() {
+      if (this.toolarea === 'picture') this.toolarea = 'none';
+      else this.toolarea = 'picture';
+    },
+    async addPicture() {
+      let res = await wepy.chooseImage();
+      let pendingImages = [];
+      for (let file of res.tempFiles) {
+        if (file.size > 20 * 1024 * 1024) { // 20M
+          await wepy.showModal({
+            title: '错误',
+            content: '无法上传超过20M的图片',
+            showCancel: false
+          });
+          return;
+        } else if (file.size > 3 * 1024 * 1024) { // 3M
+          let { networkType } = await wepy.getNetworkType();
+          if (networkType === '2g' || networkType === '3g' || networkType === '4g') {
+            if (!this.force_upload) {
+              let res = await wepy.showModal({
+                title: '警告',
+                content: '检测到你上传的图片较大，需要消耗较多流量，是否继续？'
+              });
+              this.force_upload = res.confirm;
+            }
+            if (!this.force_upload) return;
+          }
+        }
+        pendingImages.push(file.path);
+      }
+      wepy.showLoading({
+        title: '上传中'
+      });
+      for (let filepath of pendingImages) {
+        let filename = filepath.substr(filepath.lastIndexOf('/') + 1);
+        await image.uploadImage(filename, filepath);
+        this.images.push({
+          key: filename,
+          url: await image.getUrl(filename)
+        });
+        this.content = this.content + `\n[pic${this.images.length - 1}]\n`;
+      }
+      wepy.hideLoading();
+      this.$apply();
+    },
+    async handleSubmit() {
+      await api.authRequest({
+        url: this.action === 'new' ? 'createPost' : 'updatePost',
+        method: 'POST',
+        data: {
+          openGID: await this.$parent.fetchOpenGID(),
+          postTitle: this.title,
+          postContent: this.content,
+          images: this.images.map(x => x.key),
+          postID: this.postID
+        }
+      });
+      wepy.navigateBack();
+    }
+  };
+
+  async loadPost() {
+    let res = await api.authRequest({
+      url: 'postDetail',
+      method: 'POST',
+      data: {
+        openGID: await this.$parent.fetchOpenGID(),
+        postID: this.postID
+      }
+    });
+    // console.log(res);
+    this.title = res.data.postTitle;
+    this.content = res.data.postContent;
+    this.images = [];
+    for (let key of res.data.images) {
+      this.images.push({
+        key: key,
+        url: await image.getUrl(key)
+      });
+    }
+    this.$apply();
+  }
+
+  onLoad(options) {
+    // console.log(options);
+    this.action = options.action || 'new';
+    this.postID = options.post_id || null;
+    if (this.action === 'edit') {
+      this.loadPost();
+    }
+  }
+
+  async onShow() {
+    if (
+      !await this.$parent.authorizeRequired() ||
+      !await this.$parent.groupRequired()
+    ) {
+      return;
+    }
+    await wepy.hideShareMenu();
+    let emojiList = [];
+    for (let key in emojis) {
+      emojiList.push({
+        key: key,
+        img: await emojiToPath(key)
+      });
+    }
+    this.emojiList = emojiList;
+  }
+}
+</script>

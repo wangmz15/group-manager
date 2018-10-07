@@ -1,0 +1,207 @@
+<style lang="less">
+page {
+  background-color: rgb(250, 250, 250);
+}
+.main {
+  padding-top: 50rpx;
+  background-color: #fff;
+}
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px;
+  font-size: 14px;
+}
+.textarea-placeholder {
+  font-size: 14px;
+}
+.emojis_box {
+  background: #fff;
+  border-top: 1px solid #ccc;
+  height: 150px;
+  padding: 10px 25rpx;
+  display: flex;
+  flex-flow: row wrap;
+  align-content: flex-start;
+}
+
+.emoji_wrap {
+  flex: 0 0 100rpx;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emoji {
+  width: 70rpx;
+  height: 70rpx;
+}
+.emoji_wrap .emoji {
+  padding: 5px;
+}
+
+.emoji_send {
+  color: #fff;
+  background: #1aad19;
+  border-radius: 5px;
+  font-size: 9pt;
+  width: 100%;
+  text-align: center;
+  padding: 5px 0;
+}
+</style>
+
+<template>
+  <view class="main">
+    <i-panel title="{{ type === 'post' ? '评论' : '回复'}}">
+      <textarea class="textarea" bindinput="handleContentInput" placeholder="请输入回复内容" placeholder-class="textarea-placeholder" value="{{content}}"></textarea>
+    </i-panel>
+    <toolbar
+      :left.sync="emojiable" right="submit"
+      :submitDisable.sync="submitdisable"
+      @emoji.user="handleEmoji" @submit.user="handleSubmit"></toolbar>
+
+    <view wx:if="{{showEmojis}}" class="emojis_box">
+      <view class="emoji_wrap" wx:for="{{emojiList}}" wx:key="key">
+        <image catchtap="clickEmoji" src="{{item.img}}" data-key="{{item.key}}" class="emoji"/>
+      </view>
+      <!-- <view class="emoji_wrap">
+        <text catchtap="sendMsg" class="emoji_send">发送</text>
+      </view> -->
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import Toolbar from '@/components/toolbar';
+import api from '@/utils/api';
+import { emojis, emojiToPath } from '@/utils/emojis';
+
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '回复',
+    usingComponents: {
+      'i-panel': '../iview/panel/index',
+      'i-button': '../iview/button/index',
+      'i-row': '../iview/row/index',
+      'i-col': '../iview/col/index',
+      'i-card': '../iview/card/index',
+      'i-input': '../iview/input/index',
+      'i-cell-group': '../iview/cell-group/index',
+      'i-cell': '../iview/cell/index',
+      'i-icon': '../iview/icon/index'
+    }
+  };
+  components = {
+    toolbar: Toolbar
+  };
+
+  data = {
+    content: '',
+    type: null, // post, comment, subcomment
+    ID: null,
+    replyOpenID: null,
+    emojiable: '',
+    showEmojis: false,
+    emojiList: []
+  };
+
+  computed = {
+    submitdisable() {
+      return !this.content;
+    }
+  };
+
+  methods = {
+    // 点击表情
+    clickEmoji: function(e) {
+      const { key } = e.currentTarget.dataset;
+      // this.setData({ msg: msg + key });
+      this.content = this.content + key;
+      // console.log(this.content);
+      this.$apply();
+    },
+    handleContentInput(e) {
+      this.content = e.detail.value;
+    },
+    handleEmoji() {
+      this.showEmojis = !this.showEmojis;
+      // console.log('handleEmoji');
+    },
+    async handleSubmit() {
+      // console.log('handleSubmit');
+      if (this.type === 'post') {
+        await api.authRequest({
+          url: 'updateComment',
+          method: 'POST',
+          data: {
+            fieldID: this.ID,
+            fieldType: 'post',
+            openGID: await this.$parent.fetchOpenGID(),
+            commentContent: this.content
+          }
+        });
+      } else if (this.type === 'comment') {
+        await api.authRequest({
+          url: 'updateSubcomment',
+          method: 'POST',
+          data: {
+            commentID: this.ID,
+            openGID: await this.$parent.fetchOpenGID(),
+            commentContent: this.content
+          }
+        });
+      } else if (this.type === 'subcomment') {
+        await api.authRequest({
+          url: 'updateSubcomment',
+          method: 'POST',
+          data: {
+            commentID: this.ID,
+            openGID: await this.$parent.fetchOpenGID(),
+            commentContent: this.content,
+            replyOpenID: this.replyOpenID
+          }
+        });
+      }
+      await wepy.showModal({
+        title: '提示',
+        content: '提交评论成功',
+        showCancel: false
+      });
+      wepy.navigateBack();
+    }
+  };
+
+  onLoad(options) {
+    this.ID = options.ID;
+    this.type = options.type;
+    this.replyOpenID = options.replyOpenID;
+    if (this.type === 'post') {
+      this.emojiable = 'emoji';
+      wepy.setNavigationBarTitle({
+        title: '评论'
+      });
+    }
+  }
+
+  async onShow() {
+    if (
+      !await this.$parent.authorizeRequired() ||
+      !await this.$parent.groupRequired()
+    ) {
+      return;
+    }
+    await wepy.hideShareMenu();
+    let emojiList = [];
+    for (let key in emojis) {
+      emojiList.push({
+        key: key,
+        img: await emojiToPath(key)
+      });
+    }
+    this.emojiList = emojiList;
+  }
+}
+</script>

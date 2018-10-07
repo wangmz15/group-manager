@@ -1,0 +1,141 @@
+.main {
+  background: #f8f8f9;
+  font-size: 34rpx;
+  color: #495060;
+}
+.header {
+  width: 100%;
+  background: white;
+}
+.title {
+  float: clear;
+  height: 100rpx;
+  font-size: 34rpx;
+  color: #495060;
+}
+.title_text {
+  font-weight: bold;
+  line-height: 100rpx;
+}
+.notice {
+  width: 700rpx;
+  height: auto;
+  margin-top: 20rpx;
+  padding-left: 25rpx;
+  padding-right: 25rpx;
+  padding-bottom: 10rpx;
+  background: white;
+}
+.notice_content {
+  width: 700rpx;
+  height: auto;
+}
+.album_background {
+  width: 700rpx;
+  padding-left: 25rpx;
+  padding-bottom: 10rpx;
+  padding-right: 25rpx;
+  margin-top: 20rpx;
+  background: white;
+}
+.album_one {
+  float: left;
+  width: 215rpx;
+  height: 215rpx;
+  margin-top: 15rpx;
+  margin-left: 17rpx;
+}
+.album_info {
+  padding-left: 40rpx;
+  padding-top: 80rpx;
+}
+.weekly {
+  width: 700rpx;
+  height: auto;
+  padding-left: 25rpx;
+  padding-right: 25rpx;
+  background: white;
+  margin-top: 20rpx;
+}
+.ico {
+  text-align: center;
+  font-size: 30rpx;
+  color: #80848f;
+}
+.post_list {
+  color: #495060;
+  padding-bottom: 10rpx;
+}
+.post_each {
+  margin-bottom: 20rpx;
+  padding-left: 25rpx;
+  padding-right: 25rpx;
+}
+.post_empty {
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+.emoji {
+  width: 35rpx;
+  height: 35rpx;
+  margin-top: 15rpx;
+}
+.field {
+  width: 700rpx;
+  height: auto;
+  padding-left: 25rpx;
+  padding-right: 25rpx;
+  background: white;
+  margin-top: 20rpx;
+}
+.activity {
+  color: #495060;
+}
+.inremind {
+  padding-left: 20rpx;
+  padding-right: 20rpx;
+}
+.avatar {
+  float: left;
+  width: 30%;
+  margin: 20rpx;
+}
+.text {
+  width: 100%;
+  padding-top: 24rpx;
+  font-size: 30rpx;
+  color: #80848f;
+}
+.separator {
+  height: 2rpx;
+  width: 100%;
+  margin-top: 2rpx;
+  margin-bottom: 2rpx;
+  background: #f8f8f9;
+}
+.activity_detail {
+  margin-top: 20rpx;
+  margin-bottom: 20rpx;
+  margin-left: 100rpx;
+  margin-right: 20rpx;
+}
+.description {
+  font-size: 25rpx;
+  color: #a8a8a8;
+  margin-right: 20rpx;
+  float: right;
+}
+.spin {
+  padding-top: 20rpx;
+  padding-bottom: 20rpx;
+}
+.noAlbum {
+  margin-bottom: 20rpx;
+  padding-left: 25rpx;
+  padding-right: 25rpx;
+  text-align: center;
+}
+.album {
+  width: 700rpx;
+  height: 300rpx;
+}

@@ -1,0 +1,49 @@
+page {
+  background-color: #f8f8f8;
+}
+.inremind {
+  margin: 30rpx;
+  background: #ffffff;
+}
+.title {
+  font-size: 40rpx;
+  padding-left: 30rpx;
+  color: #393938;
+}
+.description {
+  font-size: 25rpx;
+  color: #a8a8a8;
+  margin-top: 20rpx;
+  margin-bottom: 20rpx;
+}
+.uploader {
+  font-size: 30rpx;
+  color: #a8a8a8;
+  margin-left: 20rpx;
+  padding-top: 11rpx;
+  padding-left: 11prpx;
+  height: 60rpx;
+  float: left;
+}
+.rowstart {
+  margin-top: 5rpx;
+}
+.content {
+  font-size: 30rpx;
+  margin-top: 15rpx;
+  margin-left: 30rpx;
+  margin-bottom: 15rpx;
+  width: 90%;
+  color: #4b4b48;
+  text-indent: 40rpx;
+  line-height: 40rpx;
+}
+.float-button {
+  float: right;
+  background-color: white;
+  position: fixed;
+  bottom: 200rpx;
+  right: 20rpx;
+  border: 0 solid #ffffff;
+  border-radius: 200rpx;
+}

@@ -1,0 +1,87 @@
+<style lang="less">
+.toolbar {
+  padding: 0 10px;
+  height: 35px;
+  line-height: 35px;
+}
+.toolbar-icon {
+  margin: 0 3px;
+}
+.toolbar-textright {
+  display: inline;
+  float: right;
+}
+.toolbar-textbtn {
+  color: rgb(151, 230, 32);
+  margin: 2px 7px;
+  font-size: 17px;
+}
+.toolbar-textbtn-disable {
+  color: #dedede;
+}
+</style>
+
+<template>
+  <i-panel>
+    <view class="toolbar">
+    <i-icon wx:if="{{showEmoji}}" i-class="toolbar-icon" size="25" color="#999" type="emoji" bindtap="handleEmoji" />
+    <i-icon wx:if="{{showPicture}}" i-class="toolbar-icon" size="25" color="#999" type="picture" bindtap="handlePicture" />
+    <view class="toolbar-textright">
+        <text wx:if="{{showPreview}}" class="toolbar-textbtn {{ previewDisable ? 'toolbar-textbtn-disable': '' }}" bindtap="handlePreview" >预览</text>
+        <text wx:if="{{showSubmit}}" class="toolbar-textbtn {{ submitDisable ? 'toolbar-textbtn-disable' : '' }}" bindtap="handleSubmit" >发表</text>
+    </view>
+    </view>
+  </i-panel>
+</template>
+
+<script>
+import wepy from 'wepy';
+
+// <toolbar
+//    left="emoji|picture" right="preview|submit"
+//    :previewDisable.sync="" :submitDisable.sunc="" @emoji.user="" @picture.user="" @preview.user="" @submit.user="" ></toolbar>
+export default class Index extends wepy.component {
+  props = {
+    left: String,
+    right: String,
+    previewDisable: {
+      type: Boolean,
+      default: false
+    },
+    submitDisable: {
+      type: Boolean,
+      default: false
+    }
+  };
+
+  computed = {
+    showEmoji() {
+      return (this.left || '').toLowerCase().split('|').indexOf('emoji') !== -1;
+    },
+    showPicture() {
+      return (this.left || '').toLowerCase().split('|').indexOf('picture') !== -1;
+    },
+    showPreview() {
+      return (this.right || '').toLowerCase().split('|').indexOf('preview') !== -1;
+    },
+    showSubmit() {
+      return (this.right || '').toLowerCase().split('|').indexOf('submit') !== -1;
+    }
+  }
+
+  methods = {
+    handleEmoji() {
+      this.$emit('emoji');
+    },
+    handlePicture() {
+      this.$emit('picture');
+    },
+    handlePreview() {
+      if (!this.previewDisable) this.$emit('preview');
+    },
+    handleSubmit() {
+      if (!this.submitDisable) this.$emit('submit');
+    }
+  };
+}
+</script>

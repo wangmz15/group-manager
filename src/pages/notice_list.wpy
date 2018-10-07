@@ -1,0 +1,181 @@
+<style lang="less">
+page {
+  background-color: #f8f8f8;
+}
+.inremind {
+  margin: 30rpx;
+  background: #ffffff;
+}
+.title {
+  font-size: 40rpx;
+  padding-left: 30rpx;
+  color: hsl(60, 1%, 22%);
+}
+.description {
+  font-size: 25rpx;
+  color: #a8a8a8;
+  margin-top: 20rpx;
+  margin-bottom: 20rpx;
+}
+.uploader {
+  font-size: 30rpx;
+  color: #a8a8a8;
+  margin-left: 20rpx;
+  padding-top: 11rpx;
+  padding-left: 11prpx;
+  height: 60rpx;
+  float: left;
+}
+.rowstart {
+  margin-top: 5rpx;
+}
+.content {
+  font-size: 30rpx;
+  margin-top: 15rpx;
+  margin-left: 30rpx;
+  margin-bottom: 15rpx;
+  width: 90%;
+  color: hsl(60, 2%, 29%);
+  text-indent: 40rpx;
+  line-height: 40rpx;
+}
+.float-button {
+  float: right;
+  background-color: white;
+  position: fixed;
+  bottom: 200rpx;
+  right: 20rpx;
+  border: 0 solid #ffffff;
+  border-radius: 200rpx;
+}
+</style>
+
+
+
+<template>
+    <view>
+      <repeat for="{{notices}}" key="index" index="index" item="item">
+        <view class="inremind" bindtap="bindShowDetail({{item.noticeID}})">
+          <i-row i-class="rowstart">
+            <i-col span="22" i-class="uploader">
+              <i-avatar src="{{item.authorAvatarUrl}}" size="mini" i-class="avatar"></i-avatar> {{item.authorNickName}}
+            </i-col>
+            <i-col span="1" i-class='demo-badge'><i-badge dot  wx:if='{{(!item.readed)&&(from == 0)&&(item.authorOpenID !== openID)}}' /></i-col>
+            
+          </i-row>
+
+          <i-row span="24" i-class="title">{{item.noticeTitle}}</i-row>
+          
+          <i-row>
+            <i-col span="20" i-class="description">
+              <text style="margin-left: 20rpx;">{{item.createdAt}}</text>
+            </i-col>
+            <i-col span="4" i-class="description">
+              <text style="margin-right: 10rpx;">已读({{item.viewerNumber}})</text>
+            </i-col>
+          </i-row>
+        </view>
+      </repeat>
+      <i-icon type="add" size="35" class="float-button" bindtap="addNotice"/>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/utils/api';
+import time from '@/utils/time';
+
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '公告列表',
+    usingComponents: {
+      'i-panel': '../iview/panel/index',
+      'i-button': '../iview/button/index',
+      'i-row': '../iview/row/index',
+      'i-col': '../iview/col/index',
+      'i-card': '../iview/card/index',
+      'i-input': '../iview/input/index',
+      'i-cell-group': '../iview/cell-group/index',
+      'i-cell': '../iview/cell/index',
+      'i-icon': '../iview/icon/index',
+      'i-badge': '../iview/badge/index'
+    },
+    enablePullDownRefresh: true
+  };
+
+  data = {
+    notices: [],
+    from: -1,
+    openID: null
+  };
+
+  components = {};
+
+  methods = {
+    addNotice() {
+      wepy.navigateTo({
+        url: '/pages/notice_new'
+      });
+    },
+    bindShowDetail(noticeID) {
+      wepy.navigateTo({
+        url: '/pages/notice_detail?notice_id=' + noticeID
+      });
+    }
+  };
+
+  onPullDownRefresh() {
+    wepy.stopPullDownRefresh();
+    this.refreshListNotice();
+  }
+
+  async refreshListNotice() {
+    wepy.showNavigationBarLoading();
+    try {
+      let res = await api.authRequest({
+        url: 'listNotice',
+        method: 'POST',
+        data: {
+          openGID: await this.$parent.fetchOpenGID()
+        }
+      });
+      // console.log(res);
+      this.notices = res.data.notices;
+      for (var j = 0, len = this.notices.length; j < len; j++) {
+        this.notices[j].createdAt = await time.getTime(this.notices[j].createdAt);
+      }
+      this.$apply();
+    } catch (e) {
+      console.error(e);
+    }
+    wepy.hideNavigationBarLoading();
+  }
+
+  onShareAppMessage(options) {
+    return {
+      title: '大家快来看公告',
+      path: `/pages/notice_list?openGID=${this.$parent.globalData.openGID}`,
+      imageUrl: '/images/logo.png'
+    };
+  }
+
+  onLoad(options) {
+    this.from = options.from;
+    this.openID = this.$parent.globalData.openID;
+    // console.log(this.from)
+  }
+
+  async onShow() {
+    if (
+      !await this.$parent.authorizeRequired() ||
+      !await this.$parent.groupRequired()
+    ) {
+      return;
+    }
+    wepy.showShareMenu({
+      withShareTicket: true
+    });
+    this.refreshListNotice();
+  }
+}
+</script>

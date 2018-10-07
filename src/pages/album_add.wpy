@@ -1,0 +1,98 @@
+<style lang="less">
+.form {
+  width: 100%;
+  background: #f8f8f9;
+  margin: 5rpx;
+}
+.prompt {
+  width: 100%;
+  padding: 10rpx;
+  font-size: 32rpx;
+}
+</style>
+<template>
+  <view class="form">
+    <i-icon type="label" size="24" color="#80848f" />
+    <text class="prompt">相册名称</text>
+    <i-input value="{{ album_title }}" maxlength="10" placeholder="请输入相册标题" bind:change="handleTitleChange" />
+    <i-icon type="lock_fill" size="24" color="#80848f" />
+    <text class="prompt">相册权限</text>
+    <i-radio-group current="{{current}}" bindchange="handlePermissionChange">
+      <i-radio wx:for="{{permission}}" position="{{position}}" wx:key="{{item.id}}" value="{{item.name}}">
+      </i-radio>
+    </i-radio-group>
+    <i-button bind:click="handleFinishClick" type="success" shape="circle">完成</i-button>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/utils/api';
+
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '创建相册',
+    usingComponents: {
+      'i-button': '../iview/button/index',
+      'i-input': '../iview/input/index',
+      'i-icon': '../../iview/icon/index',
+      'i-radio': '../../iview/radio/index',
+      'i-radio-group': '../../iview/radio-group/index'
+    }
+  };
+  components = {};
+
+  data = {
+    permission: [
+      {
+        id: 1,
+        name: '所有人都可上传'
+      },
+      {
+        id: 2,
+        name: '仅自己可以上传'
+      }
+    ],
+    userinfo: null,
+    album_title: '',
+    current: '所有人都可上传'
+  };
+
+  computed = {};
+
+  methods = {
+    async handleTitleChange({ detail }) {
+      // console.log(detail);
+      this.album_title = detail.detail.value;
+    },
+    async handlePermissionChange({ detail = {} }) {
+      // console.log('handlePermissionChange');
+      this.current = detail.value;
+      this.$apply();
+    },
+    async handleFinishClick() {
+      // console.log('handleFinishClick');
+      await api.authRequest({
+        url: 'newAlbum',
+        method: 'POST',
+        data: {
+          openGID: await this.$parent.fetchOpenGID(),
+          albumTitle: this.album_title
+        }
+      });
+      wepy.navigateBack();
+    }
+  };
+
+  async onShow() {
+    if (
+      !await this.$parent.authorizeRequired() ||
+      !await this.$parent.groupRequired()
+    ) {
+      return;
+    }
+    wepy.hideShareMenu();
+  }
+  onLoad() {}
+}
+</script>
